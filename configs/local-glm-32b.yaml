@@ -1,0 +1,32 @@
+# Local GLM-4-32B-0414-4bit Configuration
+model_list:
+  - model_name: glm-4-32b-local
+    litellm_params:
+      model: openai/mlx-community/GLM-4-32B-0414-4bit
+      api_base: http://localhost:18081/v1
+      api_key: dummy-key
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 120
+  drop_params: true
+
+general_settings:
+  master_key: dummy-key
+  completion_model: glm-4-32b-local
+
+# MLX Server Configuration
+mlx_config:
+  model: "mlx-community/GLM-4-32B-0414-4bit"
+  port: 18081
+
+# Model info
+model_info:
+  name: "GLM-4-32B-0414-4bit (Local)"
+  type: "local"
+  provider: "MLX"
+  parameters: "5.09B"
+  quantization: "4-bit"
+  capabilities: ["tool_calling", "coding", "reasoning"]
+  memory_usage: "~8GB"

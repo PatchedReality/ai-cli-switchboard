@@ -1,0 +1,25 @@
+# DeepSeek API Configuration
+model_list:
+  - model_name: deepseek-r1
+    litellm_params:
+      model: deepseek/deepseek-reasoner
+      api_key: ${DEEPSEEK_API_KEY}
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 120
+  drop_params: true
+
+general_settings:
+  master_key: dummy-key
+  completion_model: deepseek-r1
+
+# Model info
+model_info:
+  name: "DeepSeek-R1"
+  type: "remote"
+  provider: "DeepSeek"
+  context_length: 128000
+  capabilities: ["reasoning", "coding", "tool_calling"]
+  cost: "$2.19/1M output tokens"
