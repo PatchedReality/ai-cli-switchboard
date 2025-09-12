@@ -19,7 +19,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
 fi
 
 # Extract model info from config
-MODEL=$(grep "model:" "$CONFIG_FILE" | grep "mlx-community" | cut -d'"' -f2)
+MODEL=$(grep -A2 "mlx_config:" "$CONFIG_FILE" | grep "model:" | cut -d'"' -f2)
 MLX_PORT=$(grep "port:" "$CONFIG_FILE" | cut -d' ' -f2 | head -1)
 MODEL_NAME=$(grep "name:" "$CONFIG_FILE" | cut -d'"' -f2)
 
@@ -46,27 +46,67 @@ if lsof -i:$MLX_PORT > /dev/null 2>&1; then
     exit 1
 fi
 
-# Set up environment
-export PYTHONPATH="$HOME/Library/Python/3.9/lib/python/site-packages:$PYTHONPATH"
+# Set up environment - use current python3 configuration
 
-# Start MLX server
-echo "📡 Starting MLX server on port $MLX_PORT..."
-nohup /usr/bin/python3 -c "
-import sys
-sys.path.insert(0, '$HOME/Library/Python/3.9/lib/python/site-packages')
+# Check if model exists locally
+echo "🔍 Checking model availability: $MODEL"
+MODEL_EXISTS=$(python3 -c "
+import os
+try:
+    cache_dir = os.path.expanduser('~/.cache/huggingface/hub')
+    if os.path.exists(cache_dir):
+        model_cache_exists = any('$MODEL'.replace('/', '--') in d for d in os.listdir(cache_dir) if os.path.isdir(os.path.join(cache_dir, d)))
+        print('true' if model_cache_exists else 'false')
+    else:
+        print('false')
+except:
+    print('false')
+")
+
+if [ "$MODEL_EXISTS" = "true" ]; then
+    echo "✅ Model found in local cache"
+    echo "📡 Starting MLX server in background on port $MLX_PORT..."
+    
+    # Start MLX server in background
+    nohup python3 -c "
 from mlx_lm.server import main
 import sys
 sys.argv = ['mlx_lm.server', '--model', '$MODEL', '--port', '$MLX_PORT']
 main()
 " > "mlx-server.log" 2>&1 &
-MLX_PID=$!
-
-# Wait for MLX server to start
-sleep 3
+    MLX_PID=$!
+    
+    # Wait for MLX server to start
+    sleep 3
+    
+else
+    echo "📦 Model not found locally - will download first"
+    echo "📡 Starting MLX server in foreground (showing download progress)..."
+    echo ""
+    
+    # Start MLX server in foreground until it's running
+    python3 -c "
+from mlx_lm.server import main
+import sys
+sys.argv = ['mlx_lm.server', '--model', '$MODEL', '--port', '$MLX_PORT']
+main()
+" &
+    MLX_PID=$!
+    
+    # Wait for server to be responding (no timeout - model download can take time)
+    echo ""
+    echo "⏳ Waiting for server to be ready (downloading model if needed)..."
+    while true; do
+        if curl -s http://localhost:$MLX_PORT/v1/models > /dev/null 2>&1; then
+            echo "✅ MLX server is ready! Moving to background..."
+            break
+        fi
+        sleep 10
+    done
+fi
 
 # Start LiteLLM Proxy
 echo "🔄 Starting LiteLLM Proxy on port $PROXY_PORT..."
-export PATH="$HOME/Library/Python/3.9/bin:$PATH"
 nohup litellm --config "$CONFIG_FILE" --port $PROXY_PORT > "litellm-proxy.log" 2>&1 &
 PROXY_PID=$!
 

@@ -21,7 +21,7 @@
       "WebFetch(domain:claudelog.com)",
       "WebFetch(domain:gist.github.com)",
       "WebFetch(domain:docs.litellm.ai)",
-      "Bash(PYTHONPATH=\"$HOME/Library/Python/3.9/lib/python/site-packages:$PYTHONPATH\" /usr/bin/python3 -m pip install 'litellm[proxy]' --user)",
+      "Bash(PYTHON_VERSION=$(python3 --version | cut -d' ' -f2 | cut -d'.' -f1-2); PYTHONPATH=\"$HOME/Library/Python/$PYTHON_VERSION/lib/python/site-packages:$PYTHONPATH\" /usr/bin/python3 -m pip install 'litellm[proxy]' --user)",
       "Bash(export:*)",
       "Bash(litellm:*)",
       "Bash(./stop-glm.sh:*)",

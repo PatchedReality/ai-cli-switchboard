@@ -30,7 +30,8 @@ if [ ! -f "$CONFIG_PATH" ]; then
 fi
 
 # Set up Python environment
-export PATH="$HOME/Library/Python/3.9/bin:$PATH"
+PYTHON_VERSION=$(python3 --version | cut -d' ' -f2 | cut -d'.' -f1-2)
+export PATH="$HOME/Library/Python/$PYTHON_VERSION/bin:$PATH"
 
 # Load environment variables from .env file
 if [ -f "$PROJECT_DIR/.env" ]; then
@@ -45,7 +46,7 @@ fi
 
 # Check dependencies
 if ! command -v litellm >/dev/null 2>&1; then
-    error "litellm not found. Install with: pip install 'litellm[proxy]'"
+    error "litellm not found. Install with: pip3 install 'litellm[proxy]'"
 fi
 
 # Extract model info (simplified parsing)

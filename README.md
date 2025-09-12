@@ -2,6 +2,35 @@
 
 Flexible AI coding assistant with support for local and remote models via LiteLLM proxy. Use any model with the same Claude Code interface and tools.
 
+## 📋 Prerequisites
+
+### System Requirements
+- **macOS** with Apple Silicon (M1/M2/M3/M4) for local models
+- **Python 3.10+** (Python 3.12 recommended for full MLX support)
+- **Claude Code** - Install from [Anthropic's official CLI](https://github.com/anthropics/claude-code)
+
+> **⚠️ MLX Compatibility**: Local models require Python 3.9-3.12. Python 3.13 is not yet supported by MLX.
+
+### Quick Setup
+
+```bash
+# Run the setup script (installs dependencies)
+./setup.sh
+```
+
+**Manual installation:**
+```bash
+# Install LiteLLM (required for all models)
+pip3 install 'litellm[proxy]'
+
+# Install MLX (required for local models only)  
+pip3 install mlx-lm
+
+# Optional: Set Python path for user installs
+PYTHON_VERSION=$(python3 --version | cut -d' ' -f2 | cut -d'.' -f1-2)
+export PATH="$HOME/Library/Python/$PYTHON_VERSION/bin:$PATH"
+```
+
 ## 🚀 Quick Start
 
 ### 1. Setup Environment Variables
@@ -28,6 +57,7 @@ ls configs/
 # Local models (no API keys needed, but requires model download)
 ./scripts/start-local.sh configs/local-glm-9b.yaml
 ./scripts/start-local.sh configs/local-glm-32b.yaml
+./scripts/start-local.sh configs/local-deepseek-v2.5.yaml
 ```
 
 ### 3. Use with Claude Code
@@ -59,6 +89,7 @@ source ai-aliases.sh         # Load aliases
 # Now use shortcuts like:
 claude-remote-deepseek      # Start DeepSeek-R1
 claude-local-9b            # Start local GLM-9B
+claude-local-deepseek      # Start local DeepSeek-V2.5
 claude-stop                # Stop services
 claude-status              # Check status
 claude-models              # Show all available commands
@@ -75,6 +106,7 @@ claudel                    # Run Claude Code with local proxy
 ### Local Models (no API keys, requires MLX)
 - **GLM-4-9B**: Smaller, faster model (~2GB memory)
 - **GLM-4-32B**: Larger, more capable model (~8GB memory)
+- **DeepSeek-V2.5**: Advanced reasoning model (~25-30GB memory)
 
 ## 🔧 Technical Details
 
@@ -100,6 +132,25 @@ claudel                    # Run Claude Code with local proxy
 - **Authentication failed**: Check API keys in `.env`
 - **Rate limiting**: Most services have usage limits
 - **Billing required**: Gemini models require billing setup
+
+### Setup Issues
+- **`litellm` command not found**: Run `pip3 install 'litellm[proxy]' --user` and add the appropriate Python user bin directory to PATH (e.g., `export PATH="$HOME/Library/Python/$(python3 --version | cut -d' ' -f2 | cut -d'.' -f1-2)/bin:$PATH")`
+- **`claude` command not found**: Install Claude Code from https://github.com/anthropics/claude-code
+- **Python version errors**: Requires Python 3.10+ for general use, 3.9-3.12 for MLX local models
+- **MLX installation fails**: Only supported on Apple Silicon Macs with Python 3.9-3.12
+
+### Python Version Management
+If you're on Python 3.13 and want local MLX models, install a compatible version:
+```bash
+# Install Python 3.12 via Homebrew
+brew install python@3.12
+
+# Make it the default python3 (add to ~/.zshrc or ~/.bashrc)
+export PATH="/usr/local/opt/python@3.12/libexec/bin:$PATH"
+
+# Verify the change
+python3 --version  # Should show a compatible version
+```
 
 ## 📁 Project Structure
 
