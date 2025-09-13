@@ -4,6 +4,14 @@
 # Helper functions
 log() { echo "$1"; }
 
+# Check for --watch flag
+WATCH_MODE=false
+if [[ "$1" == "--watch" ]]; then
+    WATCH_MODE=true
+fi
+
+show_status() {
+
 echo "📊 AI Services Status"
 echo "===================="
 
@@ -93,4 +101,21 @@ else
     done
     echo ""
     echo "To start remote: ./scripts/start-remote-v2.sh configs/remote-gemini.yaml"
+fi
+
+}
+
+# Main execution
+if [[ "$WATCH_MODE" == true ]]; then
+    echo "🔄 Watching status... (Press Ctrl+C to exit)"
+    echo ""
+    while true; do
+        clear
+        show_status
+        echo ""
+        echo "$(date '+%H:%M:%S') - Refreshing every 3 seconds..."
+        sleep 3
+    done
+else
+    show_status
 fi

@@ -39,7 +39,6 @@ if [ -f "$PROJECT_DIR/.env" ]; then
     set -a  # Mark all new/modified vars for export
     source "$PROJECT_DIR/.env"
     set +a  # Turn off auto-export
-    log "✅ Loaded: DEEPSEEK_API_KEY, GEMINI_API_KEY, OPENROUTER_API_KEY"
 else
     log "⚠️  No .env file found at $PROJECT_DIR/.env"
 fi

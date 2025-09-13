@@ -1,0 +1,26 @@
+# Z.AI GLM-4.5 Direct API Configuration
+model_list:
+  - model_name: glm-4.5-air-zai
+    litellm_params:
+      model: openai/glm-4.5-air  # Use OpenAI-compatible format for LiteLLM
+      api_base: https://api.z.ai/api/paas/v4
+      api_key: ${ZAI_API_KEY}
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 120
+  drop_params: true
+
+general_settings:
+  master_key: dummy-key
+  completion_model: glm-4.5-air-zai
+  
+# Model info
+model_info:
+  name: "GLM-4.5 (Z.AI Direct)"
+  type: "remote"
+  provider: "Z.AI"
+  context_length: 131072
+  capabilities: ["tool_calling", "reasoning", "coding", "vision"]
+  cost: "Direct Z.AI pricing"

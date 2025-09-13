@@ -55,7 +55,8 @@ import os
 try:
     cache_dir = os.path.expanduser('~/.cache/huggingface/hub')
     if os.path.exists(cache_dir):
-        model_cache_exists = any('$MODEL'.replace('/', '--') in d for d in os.listdir(cache_dir) if os.path.isdir(os.path.join(cache_dir, d)))
+        model_name = 'models--' + '$MODEL'.replace('/', '--').lower()
+        model_cache_exists = any(model_name == d.lower() for d in os.listdir(cache_dir) if os.path.isdir(os.path.join(cache_dir, d)))
         print('true' if model_cache_exists else 'false')
     else:
         print('false')
@@ -107,7 +108,12 @@ fi
 
 # Start LiteLLM Proxy
 echo "🔄 Starting LiteLLM Proxy on port $PROXY_PORT..."
-nohup litellm --config "$CONFIG_FILE" --port $PROXY_PORT > "litellm-proxy.log" 2>&1 &
+nohup python3 -c "
+import sys
+sys.argv = ['litellm', '--config', '$CONFIG_FILE', '--port', '$PROXY_PORT']
+from litellm import run_server
+run_server()
+" > "litellm-proxy.log" 2>&1 &
 PROXY_PID=$!
 
 # Save PIDs and config
