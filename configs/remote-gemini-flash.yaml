@@ -10,8 +10,6 @@ litellm_settings:
   failure_callback: []
   request_timeout: 120
   drop_params: true
-  disable_cache: true
-  cache: false
 
 general_settings:
   master_key: dummy-key

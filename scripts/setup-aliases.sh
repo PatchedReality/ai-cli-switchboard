@@ -16,15 +16,19 @@ cat > "$PROJECT_DIR/ai-aliases.sh" << 'EOF'
 AI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Local Models
-alias claude-local-9b="$AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-glm-9b.yaml"
-alias claude-local-32b="$AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-glm-32b.yaml"
+alias claude-local-glm-9b="$AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-glm-9b.yaml"
+alias claude-local-glm-32b="$AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-glm-32b.yaml"
 alias claude-local-deepseek="$AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-deepseek-v2.5.yaml"
+alias claude-local-fuseo1="$AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-fuseo1.yaml"
+alias claude-local-gemma-2b="$AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-gemma-2b-coder.yaml"
 
 # Remote Models  
 alias claude-remote-glm="$AI_DIR/scripts/claude-zai.sh"
 alias claude-remote-glm-air="$AI_DIR/scripts/claude-zai.sh --air"
 alias claude-remote-deepseek="$AI_DIR/scripts/start-remote.sh $AI_DIR/configs/remote-deepseek.yaml"
-alias claude-remote-gemini="$AI_DIR/scripts/start-remote.sh $AI_DIR/configs/remote-gemini.yaml"
+alias claude-remote-gemini-flash="$AI_DIR/scripts/start-remote.sh $AI_DIR/configs/remote-gemini-flash.yaml"
+alias claude-remote-gemini-pro="$AI_DIR/scripts/start-remote.sh $AI_DIR/configs/remote-gemini-pro.yaml"
+alias claude-remote-gemini="$AI_DIR/scripts/start-remote.sh $AI_DIR/configs/remote-gemini-flash.yaml"
 
 # Universal commands
 alias claude-stop="$AI_DIR/scripts/stop.sh"
@@ -33,17 +37,11 @@ alias claude-status="$AI_DIR/scripts/status.sh"
 # Claude Code with local proxy
 alias claudel="ANTHROPIC_BASE_URL=http://localhost:18080 ANTHROPIC_API_KEY=dummy-key claude"
 
-# Quick switchers (stop current, start new)
-alias claude-switch-9b="$AI_DIR/scripts/stop.sh && $AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-glm-9b.yaml"
-alias claude-switch-32b="$AI_DIR/scripts/stop.sh && $AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-glm-32b.yaml"
-alias claude-switch-local-deepseek="$AI_DIR/scripts/stop.sh && $AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-deepseek-v2.5.yaml"
-alias claude-switch-glm="$AI_DIR/scripts/stop.sh && $AI_DIR/scripts/claude-zai.sh"
-alias claude-switch-glm-air="$AI_DIR/scripts/stop.sh && $AI_DIR/scripts/claude-zai.sh --air"
-alias claude-switch-deepseek="$AI_DIR/scripts/stop.sh && $AI_DIR/scripts/start-remote.sh $AI_DIR/configs/remote-deepseek.yaml"
-alias claude-switch-gemini="$AI_DIR/scripts/stop.sh && $AI_DIR/scripts/start-remote.sh $AI_DIR/configs/remote-gemini.yaml"
+# Note: All start commands automatically stop existing services first
+# So no separate switch commands are needed
 
 # Show available models
-alias claude-models="echo 'Available Models:'; echo '  Local: claude-local-9b, claude-local-32b, claude-local-deepseek'; echo '  Remote: claude-remote-glm, claude-remote-glm-air, claude-remote-deepseek, claude-remote-gemini'; echo '  Quick Switch: claude-switch-[model]'; echo '  Control: claude-stop, claude-status'; echo '  Claude Code: claudel (connects to local proxy)'"
+alias claude-models="echo 'Available Models:'; echo '  Local: claude-local-glm-9b, claude-local-glm-32b, claude-local-deepseek, claude-local-fuseo1, claude-local-gemma-2b'; echo '  Remote: claude-remote-glm, claude-remote-glm-air, claude-remote-deepseek, claude-remote-gemini-flash, claude-remote-gemini-pro'"
 
 echo "🤖 AI model aliases loaded!"
 echo "Usage: claude-models (to see all commands)"
@@ -56,18 +54,23 @@ echo "✅ Aliases created!"
 echo ""
 echo "📋 Available Commands:"
 echo "   🏠 Local Models:"
-echo "      claude-local-9b     - GLM-4-9B (2GB, fast)"
-echo "      claude-local-32b    - GLM-4-32B (8GB, better)"  
-echo "      claude-local-deepseek - DeepSeek-V2.5 (25-30GB, reasoning)"
+echo "      claude-local-glm-9b     - GLM-4-9B (2GB, fast)"
+echo "      claude-local-glm-32b    - GLM-4-32B (8GB, better)"  
+echo "      claude-local-deepseek - DeepSeek-V2.5 (25-30GB, reasoning)
+      claude-local-fuseo1 - FuseO1 DeepSeek+Qwen Coder (6-8GB, coding+tools)
+      claude-local-gemma-2b - Gemma 2B Coder (1-2GB, fast coding)"
+echo ""
 echo ""
 echo "   ☁️  Remote Models:"
 echo "      claude-remote-glm   - GLM-4.5 (Z.AI)"
 echo "      claude-remote-glm-air - GLM-4.5-Air (Z.AI)"
-echo "      claude-remote-deepseek - DeepSeek-R1 (PAID)"
-echo "      claude-remote-gemini - Gemini 2.5 Pro (PAID)"
+echo "      claude-remote-deepseek - DeepSeek-R1 (platform.deepseek.com)"
+echo "      claude-remote-gemini-flash - Gemini 2.5 Flash (ai.google.dev)"
+echo "      claude-remote-gemini-pro - Gemini 2.5 Pro (ai.google.dev)"
+echo "      claude-remote-gemini - Gemini Flash (default, ai.google.dev)"
 echo ""
-echo "   🔄 Quick Switchers:"
-echo "      claude-switch-[model] - Stop current, start new"
+echo "   ℹ️  Note:"
+echo "      All start commands automatically stop existing services first"
 echo ""
 echo "   🎛️  Control:"
 echo "      claude-stop         - Stop all services"

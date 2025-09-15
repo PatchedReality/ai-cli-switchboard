@@ -1,0 +1,25 @@
+# Google Gemini API Configuration (Pro)
+model_list:
+  - model_name: gemini-2-pro
+    litellm_params:
+      model: gemini/gemini-2.5-pro
+      api_key: ${GEMINI_API_KEY}
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 120
+  drop_params: true
+
+general_settings:
+  master_key: dummy-key
+  completion_model: gemini-2-pro
+
+# Model info
+model_info:
+  name: "Gemini 2.5 Pro"
+  type: "remote"
+  provider: "Google"
+  context_length: 2097152
+  capabilities: ["coding", "reasoning", "tool_calling", "multimodal", "audio", "video"]
+  cost: "Paid: highest accuracy, most powerful model"
