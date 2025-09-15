@@ -31,3 +31,9 @@ model_info:
   capabilities: ["coding", "reasoning", "tool_calling"]
   memory_requirement: "~25-30GB RAM"
   cost: "Free (local inference)"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-local-deepseek"
+  runner_type: "local_mlx"
+  description: "DeepSeek-V2.5 (25-30GB, reasoning)"

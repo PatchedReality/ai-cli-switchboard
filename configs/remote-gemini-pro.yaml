@@ -23,3 +23,9 @@ model_info:
   context_length: 2097152
   capabilities: ["coding", "reasoning", "tool_calling", "multimodal", "audio", "video"]
   cost: "Paid: highest accuracy, most powerful model"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-remote-gemini-pro"
+  runner_type: "remote_litellm"
+  description: "Gemini 2.5 Pro (ai.google.dev)"

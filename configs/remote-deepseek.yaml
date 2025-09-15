@@ -23,3 +23,9 @@ model_info:
   context_length: 128000
   capabilities: ["reasoning", "coding", "tool_calling"]
   cost: "$2.19/1M output tokens"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-remote-deepseek"
+  runner_type: "remote_litellm"
+  description: "DeepSeek-R1 (platform.deepseek.com)"

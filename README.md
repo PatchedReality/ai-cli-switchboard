@@ -51,11 +51,14 @@ OPENROUTER_API_KEY=your_openrouter_key
 # List available configurations
 ls configs/
 
-# Remote models (require API keys)
+# Remote models via LiteLLM (require API keys)
 ./scripts/start-remote.sh configs/remote-deepseek.yaml
 ./scripts/start-remote.sh configs/remote-gemini-flash.yaml
 ./scripts/start-remote.sh configs/remote-gemini-pro.yaml
-./scripts/start-remote.sh configs/remote-glm-4.5-air-zai.yaml
+
+# Remote models via Z.AI direct (require Z.AI API key)
+./scripts/claude-zai.sh          # GLM-4.5
+./scripts/claude-zai.sh --air    # GLM-4.5-Air
 
 # Local models via MLX (no API keys needed, requires model download)
 ./scripts/start-local.sh configs/local-glm-9b.yaml
@@ -90,32 +93,77 @@ This warning can be safely ignored when using local models via the proxy. The `c
 ## 🎛️ Server Management
 
 ```bash
-./scripts/start-remote.sh <config>  # Start remote model
-./scripts/start-local.sh <config>   # Start local model  
-./scripts/stop.sh                   # Stop all services
-./scripts/status.sh                 # Check server status
+# Start models by type
+./scripts/start-remote.sh <config>    # Start remote model via LiteLLM
+./scripts/start-local.sh <config>     # Start local model via MLX
+./scripts/start-lmstudio.sh <config>  # Start local model via LM Studio
+./scripts/claude-zai.sh [--air]       # Start GLM model via Z.AI direct
+
+# Universal management
+./scripts/stop.sh                     # Stop all services
+./scripts/status.sh                   # Check server status
 ```
 
-## ⚡ Convenient Aliases
+## ⚡ Dynamic Alias System
 
-Set up shortcuts for quick model switching:
+The setup script now automatically generates aliases from config metadata - no manual updates needed when adding new models!
+
 ```bash
-./scripts/setup-aliases.sh   # Creates ai-aliases.sh
+./scripts/setup-aliases.sh   # Creates ai-aliases.sh from configs
 source ai-aliases.sh         # Load aliases
 
 # Now use shortcuts like:
 claude-remote-deepseek         # Start DeepSeek-R1
+claude-remote-glm             # Start GLM-4.5 via Z.AI (direct)
+claude-remote-glm-air         # Start GLM-4.5-Air via Z.AI (direct)
 claude-local-glm-9b           # Start local GLM-9B
 claude-local-deepseek         # Start local DeepSeek-V2.5
 claude-local-fuseo1           # Start local FuseO1
 claude-local-gemma-2b         # Start local Gemma 2B
 claude-lmstudio-llama-groq    # Start Llama 3 Groq via LM Studio
 claude-lmstudio-gemma-7b      # Start CodeGemma 7B via LM Studio
+claude-lmstudio-gemma-2b      # Start Gemma 2B Coder via LM Studio
 claude-stop                   # Stop services
 claude-status                 # Check status
 claude-models                 # Show all available commands
 claudel                       # Run Claude Code with local proxy
 ```
+
+**🔧 How it works:**
+- Each config file has an `alias_config` section with metadata
+- `setup-aliases.sh` reads all configs and generates aliases automatically
+- Adding new configs = new aliases automatically appear
+- No more manual alias maintenance!
+
+## 🏃 Runner Types
+
+The system supports four different runner types, each optimized for specific model deployment scenarios:
+
+### `local_mlx` - Local MLX Models
+- **Engine**: MLX framework for Apple Silicon optimization
+- **Memory usage**: Varies by model (1-30GB)
+- **Requirements**: Apple Silicon Mac, Python 3.9-3.13, MLX installed
+- **Examples**: GLM-4-9B, GLM-4-32B, DeepSeek-V2.5, FuseO1, Gemma 2B Coder
+- **Best for**: Fast local inference on Apple Silicon
+
+### `local_lmstudio` - Local LM Studio Models
+- **Engine**: LM Studio with enhanced tool calling support
+- **Memory usage**: Varies by model (1-8GB)
+- **Requirements**: LM Studio installed, models downloaded via LM Studio
+- **Examples**: Gemma 2B Coder, CodeGemma 7B, Llama 3 Groq Tool Use
+- **Best for**: Models requiring better function calling capabilities
+
+### `remote_litellm` - Remote API Models via LiteLLM
+- **Engine**: LiteLLM proxy for API model abstraction
+- **Requirements**: API keys, internet connection
+- **Examples**: DeepSeek-R1, Gemini 2.5 Flash
+- **Best for**: Access to state-of-the-art remote models
+
+### `remote_zai` - Remote Z.AI Direct Connection
+- **Engine**: Direct connection to Z.AI endpoints
+- **Requirements**: Z.AI API key, no local proxy needed
+- **Examples**: GLM-4.5-Air, GLM-4.5
+- **Best for**: Direct access to GLM models without proxy overhead
 
 ## 📊 Available Models
 
@@ -138,11 +186,13 @@ claudel                       # Run Claude Code with local proxy
 
 ## 🔧 Technical Details
 
-- **Proxy**: LiteLLM on port 18080
-- **Local Engine**: MLX for Apple Silicon optimization
+- **Proxy**: LiteLLM on port 18080 (for remote_litellm runner type)
+- **Local Engines**: MLX for Apple Silicon optimization, LM Studio for enhanced tool calling
+- **Direct Connections**: Z.AI direct endpoints (no proxy needed)
 - **API Compatible**: Works seamlessly with Claude Code interface
 - **Environment**: Automatic .env loading for API keys
-- **Config System**: YAML-based model configurations with variable substitution
+- **Config System**: YAML-based model configurations with metadata-driven alias generation
+- **Service Management**: Unified stop/start functionality across all runner types
 
 ## 🆘 Troubleshooting
 

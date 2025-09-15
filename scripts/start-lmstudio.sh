@@ -3,29 +3,18 @@
 
 set -e
 
+# Source common utilities
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+source "$SCRIPT_DIR/common-utils.sh"
 
-# Check if config file provided
-if [ -z "$1" ]; then
-    echo "❌ Error: No configuration file provided"
-    echo "Usage: $0 <config-file>"
-    exit 1
-fi
-
-CONFIG_FILE="$1"
-if [ ! -f "$CONFIG_FILE" ]; then
-    echo "❌ Error: Configuration file not found: $CONFIG_FILE"
-    exit 1
-fi
+# Validate and setup config
+CONFIG_FILE=$(validate_config_file "$1")
+check_config_exists "$CONFIG_FILE"
 
 # Check if LM Studio CLI is available
 LMS_PATH="$HOME/.lmstudio/bin/lms"
 if [ ! -f "$LMS_PATH" ]; then
-    echo "❌ Error: LM Studio CLI not found at $LMS_PATH"
-    echo "Please install LM Studio and run it at least once to set up the CLI"
-    echo "Download from: https://lmstudio.ai/"
-    exit 1
+    error "LM Studio CLI not found at $LMS_PATH\nPlease install LM Studio and run it at least once to set up the CLI\nDownload from: https://lmstudio.ai/"
 fi
 
 # Make lms executable if needed
@@ -34,31 +23,27 @@ chmod +x "$LMS_PATH"
 echo "🚀 Starting LM Studio model server..."
 
 # Stop existing services first
-echo "🛑 Stopping existing services..."
-"$SCRIPT_DIR/stop.sh" >/dev/null 2>&1 || true
+log "🛑 Stopping existing services..."
+stop_all_services >/dev/null 2>&1 || true
 
 # Extract model info from config
 MODEL_KEY=$(grep "model_key:" "$CONFIG_FILE" | head -1 | sed 's/.*model_key: *"\([^"]*\)".*/\1/')
 MODEL_NAME=$(grep "model_name:" "$CONFIG_FILE" | head -1 | sed 's/.*model_name: *\([^ ]*\).*/\1/')
 
 if [ -z "$MODEL_KEY" ]; then
-    echo "❌ Error: Could not find model_key in config file"
-    exit 1
+    error "Could not find model_key in config file"
 fi
 
 echo "📦 Model: $MODEL_NAME"
 echo "🔑 Key: $MODEL_KEY"
 
 # Check if model is downloaded
-echo "📋 Checking available models..."
+log_with_time "📋 Checking available models..."
 if ! "$LMS_PATH" ls | grep -q "$MODEL_KEY"; then
-    echo "❌ Error: Model '$MODEL_KEY' not found in LM Studio"
-    echo ""
-    echo "Available models:"
+    log_with_time "❌ Model '$MODEL_KEY' not found in LM Studio"
+    log_with_time "Available models:"
     "$LMS_PATH" ls
-    echo ""
-    echo "Please download the model using LM Studio GUI first"
-    exit 1
+    error "Please download the model using LM Studio GUI first"
 fi
 
 # Unload any existing models
@@ -81,8 +66,7 @@ for i in {1..30}; do
         break
     fi
     if [ $i -eq 30 ]; then
-        echo "❌ Error: LM Studio server failed to start"
-        exit 1
+        error "LM Studio server failed to start"
     fi
     sleep 1
 done
@@ -91,17 +75,9 @@ done
 echo "🔄 Starting LiteLLM proxy..."
 cd "$PROJECT_DIR"
 
-# Set up Python environment (like other scripts)
-PYTHON_VERSION=$(python3 --version | cut -d' ' -f2 | cut -d'.' -f1-2)
-export PATH="$HOME/Library/Python/$PYTHON_VERSION/bin:$PATH"
-
-# Load environment variables from .env file if it exists
-if [ -f "$PROJECT_DIR/.env" ]; then
-    echo "📄 Loading environment variables from .env"
-    set -a  # Mark all new/modified vars for export
-    source "$PROJECT_DIR/.env"
-    set +a  # Turn off auto-export
-fi
+# Setup environment (Python and .env file)
+setup_python_env
+load_env_file
 
 # Save current config for status script
 echo "$CONFIG_FILE" > current-config.txt
@@ -125,10 +101,9 @@ for i in {1..30}; do
         break
     fi
     if [ $i -eq 30 ]; then
-        echo "❌ Error: LiteLLM proxy failed to start"
         kill $LITELLM_PID 2>/dev/null || true
         "$LMS_PATH" server stop >/dev/null 2>&1 || true
-        exit 1
+        error "LiteLLM proxy failed to start"
     fi
     sleep 1
 done

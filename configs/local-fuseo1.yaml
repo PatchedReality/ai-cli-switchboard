@@ -34,3 +34,9 @@ model_info:
   cost: "Free (local inference)"
   performance: "13 TPS (27 TPS with speculative decoding)"
   power_usage: "5 watts on M4 Max"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-local-fuseo1"
+  runner_type: "local_mlx"
+  description: "FuseO1 DeepSeek+Qwen Coder (6-8GB, coding+tools)"

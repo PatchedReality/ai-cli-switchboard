@@ -33,3 +33,9 @@ model_info:
   cost: "Free (local inference)"
   performance: "Fast inference, suitable for code completion"
   based_on: "MAISAAI/gemma-2b-coder (converted to MLX)"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-local-gemma-2b"
+  runner_type: "local_mlx"
+  description: "Gemma 2B Coder (1-2GB, fast coding)"

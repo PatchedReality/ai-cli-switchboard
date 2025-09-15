@@ -3,20 +3,15 @@
 
 set -e
 
-CONFIG_FILE="$1"
+# Source common utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common-utils.sh"
+
 PROXY_PORT=18080
 
-# Validate arguments
-if [ -z "$CONFIG_FILE" ]; then
-    echo "Usage: $0 <config-file>"
-    echo "Example: $0 configs/local-glm-9b.yaml"
-    exit 1
-fi
-
-if [ ! -f "$CONFIG_FILE" ]; then
-    echo "❌ Config file not found: $CONFIG_FILE"
-    exit 1
-fi
+# Validate and setup config
+CONFIG_FILE=$(validate_config_file "$1")
+check_config_exists "$CONFIG_FILE"
 
 # Extract model info from config
 MODEL=$(grep -A2 "mlx_config:" "$CONFIG_FILE" | grep "model:" | cut -d'"' -f2)
@@ -24,18 +19,7 @@ MLX_PORT=$(grep "port:" "$CONFIG_FILE" | awk '{print $2}' | head -1)
 MODEL_NAME=$(grep "name:" "$CONFIG_FILE" | cut -d'"' -f2)
 
 if [ -z "$MODEL" ] || [ -z "$MLX_PORT" ]; then
-    echo "❌ Invalid local config file: $CONFIG_FILE" >&2
-    echo "Missing model or port configuration" >&2
-    echo "" >&2
-    echo "Debug info:" >&2
-    echo "  MODEL: '$MODEL'" >&2
-    echo "  MLX_PORT: '$MLX_PORT'" >&2
-    echo "" >&2
-    echo "Expected format in config file:" >&2
-    echo "  mlx_config:" >&2
-    echo "    model: \"model-name-here\"" >&2
-    echo "    port: 18082" >&2
-    exit 1
+    error "Invalid local config file: $CONFIG_FILE\nMissing model or port configuration\n\nDebug info:\n  MODEL: '$MODEL'\n  MLX_PORT: '$MLX_PORT'\n\nExpected format in config file:\n  mlx_config:\n    model: \"model-name-here\"\n    port: 18082"
 fi
 
 echo "🚀 Starting $MODEL_NAME..."
@@ -45,19 +29,14 @@ echo "📝 Proxy Port: $PROXY_PORT"
 echo ""
 
 # Check if ports are available and stop existing services
-if lsof -i:$PROXY_PORT > /dev/null 2>&1; then
-    echo "⚠️  Port $PROXY_PORT is in use. Stopping existing services..."
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    "$SCRIPT_DIR/stop.sh"
+if is_port_in_use "$PROXY_PORT" || is_port_in_use "$MLX_PORT"; then
+    log "⚠️  Required ports are in use. Stopping existing services..."
+    stop_all_services
     sleep 2
-fi
 
-if lsof -i:$MLX_PORT > /dev/null 2>&1; then
-    echo "⚠️  MLX port $MLX_PORT already in use (likely from previous MLX server)"
-    echo "   Stopping existing services..."
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    "$SCRIPT_DIR/stop.sh"
-    sleep 2
+    if is_port_in_use "$PROXY_PORT" || is_port_in_use "$MLX_PORT"; then
+        error "Could not free required ports ($PROXY_PORT, $MLX_PORT)"
+    fi
 fi
 
 # Set up environment - use current python3 configuration

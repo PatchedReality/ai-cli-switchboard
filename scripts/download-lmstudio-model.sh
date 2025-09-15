@@ -3,22 +3,14 @@
 
 set -e
 
+# Source common utilities
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common-utils.sh"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Check if model parameter provided
 if [ -z "$1" ]; then
-    echo "❌ Error: No model specified"
-    echo ""
-    echo "Usage: $0 <model-name>"
-    echo ""
-    echo "Examples:"
-    echo "  $0 lmstudio-community/Llama-3-Groq-8B-Tool-Use-GGUF"
-    echo "  $0 meta-llama/Llama-3.1-8B-Instruct"
-    echo "  $0 llama-3.2-3b-instruct"
-    echo ""
-    echo "💡 The script will automatically select recommended quantization"
-    exit 1
+    error "No model specified\\n\\nUsage: $0 <model-name>\\n\\nExamples:\\n  $0 lmstudio-community/Llama-3-Groq-8B-Tool-Use-GGUF\\n  $0 meta-llama/Llama-3.1-8B-Instruct\\n  $0 llama-3.2-3b-instruct\\n\\n💡 The script will automatically select recommended quantization"
 fi
 
 MODEL_NAME="$1"
@@ -26,10 +18,7 @@ MODEL_NAME="$1"
 # Check if LM Studio CLI is available
 LMS_PATH="$HOME/.lmstudio/bin/lms"
 if [ ! -f "$LMS_PATH" ]; then
-    echo "❌ Error: LM Studio CLI not found at $LMS_PATH"
-    echo "Please install LM Studio and run it at least once to set up the CLI"
-    echo "Download from: https://lmstudio.ai/"
-    exit 1
+    error "LM Studio CLI not found at $LMS_PATH\\nPlease install LM Studio and run it at least once to set up the CLI\\nDownload from: https://lmstudio.ai/"
 fi
 
 # Make lms executable if needed
@@ -53,9 +42,5 @@ if [ $DOWNLOAD_STATUS -eq 0 ]; then
     echo ""
     echo "💡 Model ready to use with LM Studio configurations"
 else
-    echo "❌ Download failed for: $MODEL_NAME"
-    echo ""
-    echo "💡 Available models you can search for:"
-    echo "   Run: lms get <search-term> (interactive mode)"
-    exit 1
+    error "Download failed for: $MODEL_NAME\\n\\n💡 Available models you can search for:\\n   Run: lms get <search-term> (interactive mode)"
 fi

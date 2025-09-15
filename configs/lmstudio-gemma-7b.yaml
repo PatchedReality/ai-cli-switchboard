@@ -34,3 +34,9 @@ model_info:
   memory_requirement: "~4-6GB RAM"
   cost: "Free (local inference)"
   performance: "Better than 2B, should handle tool calling"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-lmstudio-gemma-7b"
+  runner_type: "local_lmstudio"
+  description: "CodeGemma 1.1 7B via LM Studio (5GB, better tools)"

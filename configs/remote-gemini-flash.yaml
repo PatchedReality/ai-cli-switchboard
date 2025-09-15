@@ -23,3 +23,9 @@ model_info:
   context_length: 1048576
   capabilities: ["coding", "reasoning", "tool_calling"]
   cost: "Paid: requires billing setup, not free tier compatible"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-remote-gemini-flash"
+  runner_type: "remote_litellm"
+  description: "Gemini 2.5 Flash (ai.google.dev)"

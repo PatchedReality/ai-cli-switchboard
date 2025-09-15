@@ -35,3 +35,9 @@ model_info:
   cost: "Free (local inference)"
   performance: "Fast inference with LM Studio optimization"
   notes: "Requires model to be downloaded in LM Studio first"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-lmstudio-gemma-2b"
+  runner_type: "local_lmstudio"
+  description: "Gemma 2B Coder via LM Studio (1-2GB, better tools)"

@@ -30,3 +30,9 @@ model_info:
   quantization: "4-bit"
   capabilities: ["tool_calling", "coding", "reasoning"]
   memory_usage: "~8GB"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-local-glm-32b"
+  runner_type: "local_mlx"
+  description: "GLM-4-32B (8GB, better)"

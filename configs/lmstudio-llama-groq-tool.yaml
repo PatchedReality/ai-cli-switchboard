@@ -35,3 +35,9 @@ model_info:
   cost: "Free (local inference)"
   performance: "89.06% on Berkeley Function Calling Leaderboard"
   notes: "Specialized for tool calling and function use"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-lmstudio-llama-groq"
+  runner_type: "local_lmstudio"
+  description: "Llama 3 Groq 8B Tool Use (5GB, best tools)"

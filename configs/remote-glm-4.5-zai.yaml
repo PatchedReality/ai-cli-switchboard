@@ -24,3 +24,9 @@ model_info:
   context_length: 131072
   capabilities: ["tool_calling", "reasoning", "coding", "vision"]
   cost: "Direct Z.AI pricing"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-remote-glm"
+  runner_type: "remote_zai"
+  description: "GLM-4.5 (Z.AI)"
