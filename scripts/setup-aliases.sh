@@ -21,6 +21,9 @@ alias claude-local-glm-32b="$AI_DIR/scripts/start-local.sh $AI_DIR/configs/local
 alias claude-local-deepseek="$AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-deepseek-v2.5.yaml"
 alias claude-local-fuseo1="$AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-fuseo1.yaml"
 alias claude-local-gemma-2b="$AI_DIR/scripts/start-local.sh $AI_DIR/configs/local-gemma-2b-coder.yaml"
+alias claude-lmstudio-gemma-2b="$AI_DIR/scripts/start-lmstudio.sh $AI_DIR/configs/lmstudio-gemma-2b-coder.yaml"
+alias claude-lmstudio-gemma-7b="$AI_DIR/scripts/start-lmstudio.sh $AI_DIR/configs/lmstudio-gemma-7b.yaml"
+alias claude-lmstudio-llama-groq="$AI_DIR/scripts/start-lmstudio.sh $AI_DIR/configs/lmstudio-llama-groq-tool.yaml"
 
 # Remote Models  
 alias claude-remote-glm="$AI_DIR/scripts/claude-zai.sh"
@@ -41,7 +44,7 @@ alias claudel="ANTHROPIC_BASE_URL=http://localhost:18080 ANTHROPIC_API_KEY=dummy
 # So no separate switch commands are needed
 
 # Show available models
-alias claude-models="echo 'Available Models:'; echo '  Local: claude-local-glm-9b, claude-local-glm-32b, claude-local-deepseek, claude-local-fuseo1, claude-local-gemma-2b'; echo '  Remote: claude-remote-glm, claude-remote-glm-air, claude-remote-deepseek, claude-remote-gemini-flash, claude-remote-gemini-pro'"
+alias claude-models="echo 'Available Models:'; echo '  Local: claude-local-glm-9b, claude-local-glm-32b, claude-local-deepseek, claude-local-fuseo1, claude-local-gemma-2b'; echo '  LM Studio: claude-lmstudio-gemma-2b, claude-lmstudio-gemma-7b, claude-lmstudio-llama-groq'; echo '  Remote: claude-remote-glm, claude-remote-glm-air, claude-remote-deepseek, claude-remote-gemini-flash, claude-remote-gemini-pro'"
 
 echo "🤖 AI model aliases loaded!"
 echo "Usage: claude-models (to see all commands)"
@@ -56,9 +59,14 @@ echo "📋 Available Commands:"
 echo "   🏠 Local Models:"
 echo "      claude-local-glm-9b     - GLM-4-9B (2GB, fast)"
 echo "      claude-local-glm-32b    - GLM-4-32B (8GB, better)"  
-echo "      claude-local-deepseek - DeepSeek-V2.5 (25-30GB, reasoning)
-      claude-local-fuseo1 - FuseO1 DeepSeek+Qwen Coder (6-8GB, coding+tools)
-      claude-local-gemma-2b - Gemma 2B Coder (1-2GB, fast coding)"
+echo "      claude-local-deepseek - DeepSeek-V2.5 (25-30GB, reasoning)"
+echo "      claude-local-fuseo1 - FuseO1 DeepSeek+Qwen Coder (6-8GB, coding+tools)"
+echo "      claude-local-gemma-2b - Gemma 2B Coder (1-2GB, fast coding)"
+echo ""
+echo "   🏪 LM Studio Models:"
+echo "      claude-lmstudio-gemma-2b - Gemma 2B Coder via LM Studio (1-2GB, better tools)"
+echo "      claude-lmstudio-gemma-7b - CodeGemma 1.1 7B via LM Studio (5GB, better tools)"
+echo "      claude-lmstudio-llama-groq - Llama 3 Groq 8B Tool Use (5GB, best tools)"
 echo ""
 echo ""
 echo "   ☁️  Remote Models:"

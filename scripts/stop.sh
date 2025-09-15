@@ -27,6 +27,27 @@ if [ -f "mlx-server.pid" ]; then
     rm -f mlx-server.pid
 fi
 
+# Stop LM Studio server and unload models
+LMS_PATH="$HOME/.lmstudio/bin/lms"
+if [ -f "$LMS_PATH" ]; then
+    chmod +x "$LMS_PATH"
+
+    # Check if LM Studio server is running
+    if lsof -i:1234 >/dev/null 2>&1; then
+        echo "📝 Stopping LM Studio server..."
+        "$LMS_PATH" server stop >/dev/null 2>&1 || true
+        STOPPED=1
+    fi
+
+    # Unload any loaded models (this will "eject" them from LM Studio)
+    echo "📝 Unloading LM Studio models..."
+    "$LMS_PATH" unload --all >/dev/null 2>&1 || true
+
+    # Give it a moment to complete
+    sleep 1
+    STOPPED=1
+fi
+
 # Clean up legacy PID files
 for pid_file in glm-*.pid; do
     if [ -f "$pid_file" ]; then
