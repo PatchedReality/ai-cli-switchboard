@@ -211,6 +211,21 @@ The system supports four different runner types, each optimized for specific mod
 - **Rate limiting**: Most services have usage limits
 - **Billing required**: Gemini models require billing setup
 
+### Gemini Model Cache Conflicts
+⚠️ **Important**: When using multiple Gemini models (Pro, Flash, Lite) via LiteLLM, you may encounter Vertex AI cache conflicts with errors like:
+
+```
+Model used by GenerateContent request (models/gemini-2.5-flash-lite) and CachedContent (models/gemini-2.5-pro) has to be the same.
+```
+
+This occurs because Google's Vertex AI service caches content based on message content rather than model names. When switching between different Gemini models, cached content from one model may conflict with another.
+
+**Workarounds:**
+- Use only one Gemini model type per session
+- Wait for cached content to expire naturally (typically 1 hour)
+
+This is a known limitation of Google's Vertex AI context caching system when used with LiteLLM.
+
 ### Setup Issues
 - **`litellm` command not found**: Run `pip3 install 'litellm[proxy]' --user` and add the appropriate Python user bin directory to PATH (e.g., `export PATH="$HOME/Library/Python/$(python3 --version | cut -d' ' -f2 | cut -d'.' -f1-2)/bin:$PATH")`
 - **`claude` command not found**: Install Claude Code from https://github.com/anthropics/claude-code
@@ -224,7 +239,7 @@ MLX works with Python 3.9-3.13. If you need a specific version:
 brew install python@3.13
 
 # Make it the default python3 (add to ~/.zshrc or ~/.bashrc)
-export PATH="/usr/local/opt/python@3.12/libexec/bin:$PATH"
+export PATH="/usr/local/opt/python@3.13/libexec/bin:$PATH"
 
 # Verify the version
 python3 --version
