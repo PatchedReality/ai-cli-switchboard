@@ -73,3 +73,4 @@ claude-code-proxy/config.local.json
 *.bak
 *.backup
 *.old.env
+/.playwright-mcp/
