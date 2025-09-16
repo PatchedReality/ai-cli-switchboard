@@ -1,0 +1,38 @@
+# Local GLM-4-9B-0414-6bit Configuration
+model_list:
+  - model_name: glm-4-9b-local
+    litellm_params:
+      model: openai/mlx-community/GLM-4-9B-0414-6bit
+      api_base: http://localhost:18081/v1
+      api_key: dummy-key
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 120
+  drop_params: true
+
+general_settings:
+  master_key: dummy-key
+  completion_model: glm-4-9b-local
+
+# MLX Server Configuration
+mlx_config:
+  model: "mlx-community/GLM-4-9B-0414-6bit"
+  port: 18081
+
+# Model info
+model_info:
+  name: "GLM-4-9B-0414-6bit (Local)"
+  type: "local"
+  provider: "MLX"
+  parameters: "2.06B"
+  quantization: "6-bit"
+  capabilities: ["tool_calling", "coding"]
+  memory_usage: "~3GB"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-local-glm-9b"
+  runner_type: "local_mlx"
+  description: "GLM-4-9B (2GB, fast)"

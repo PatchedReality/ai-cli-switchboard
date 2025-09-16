@@ -1,0 +1,76 @@
+# Claude + Qwen3-Coder Local Setup - Git Ignore
+
+# Log files
+*.log
+qwen3-*.log
+
+# Process ID files
+*.pid
+qwen3-*.pid
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Model cache (large files)
+.cache/
+models/
+*.bin
+*.safetensors
+*.gguf
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might contain sensitive information
+.env
+.env.local
+.env.production
+config.local.json
+ai-aliases.sh
+
+# Claude Code settings (user-specific)
+.claude/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+temp-config.txt
+current-config.txt
+
+# Claude Code proxy specific ignores
+claude-code-proxy/.env.local
+claude-code-proxy/config.local.json
+
+# Hugging Face cache (can be large)
+.cache/huggingface/
+
+# MLX specific
+*.mlx
+
+# Backup files
+*.bak
+*.backup
+*.old.env
+/.playwright-mcp/

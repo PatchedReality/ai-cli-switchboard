@@ -1,0 +1,44 @@
+# LM Studio Llama 3 Groq 8B Tool Use Configuration
+# Model URL: https://huggingface.co/lmstudio-community/Llama-3-Groq-8B-Tool-Use-GGUF
+model_list:
+  - model_name: llama-groq-tool-lms
+    litellm_params:
+      model: openai/llama-3-groq-8b-tool-use
+      api_base: http://127.0.0.1:1234/v1
+      api_key: dummy-key
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 300
+  drop_params: false
+
+general_settings:
+  master_key: dummy-key
+  completion_model: llama-groq-tool-lms
+
+# LM Studio Configuration
+lmstudio_config:
+  model_key: "llama-3-groq-8b-tool-use"
+  server_port: 1234
+  gpu_offload: "max"
+  context_length: 131072
+
+# Model info
+model_info:
+  name: "Llama 3 Groq 8B Tool Use (LM Studio)"
+  type: "local"
+  provider: "LM Studio"
+  context_length: 131072
+  parameters: "8B"
+  capabilities: ["tool_calling", "api_interactions", "structured_data"]
+  memory_requirement: "~5-6GB RAM"
+  cost: "Free (local inference)"
+  performance: "89.06% on Berkeley Function Calling Leaderboard"
+  notes: "Specialized for tool calling and function use"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-lmstudio-llama-groq"
+  runner_type: "local_lmstudio"
+  description: "Llama 3 Groq 8B Tool Use (5GB, best tools)"

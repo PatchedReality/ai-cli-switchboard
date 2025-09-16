@@ -1,0 +1,42 @@
+# FuseO1-DeepSeekR1-Qwen2.5-Coder Local Configuration
+model_list:
+  - model_name: fuseo1-coder
+    litellm_params:
+      model: openai/mlx-community/FuseO1-DeepSeekR1-Qwen2.5-Coder-32B-Preview-Q8
+      api_base: http://localhost:18081/v1
+      api_key: dummy-key
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 300
+  drop_params: false
+
+general_settings:
+  master_key: dummy-key
+  completion_model: fuseo1-coder
+
+# MLX Server Configuration
+mlx_config:
+  model: "mlx-community/FuseO1-DeepSeekR1-Qwen2.5-Coder-32B-Preview-Q8"
+  port: 18081
+
+# Model info
+model_info:
+  name: "FuseO1 DeepSeek-R1 + Qwen2.5 Coder"
+  type: "local"
+  provider: "MLX"
+  context_length: 32768
+  parameters: "9.22B"
+  quantization: "8-bit"
+  capabilities: ["coding", "reasoning", "tool_calling"]
+  memory_requirement: "~6-8GB RAM"
+  cost: "Free (local inference)"
+  performance: "13 TPS (27 TPS with speculative decoding)"
+  power_usage: "5 watts on M4 Max"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-local-fuseo1"
+  runner_type: "local_mlx"
+  description: "FuseO1 DeepSeek+Qwen Coder (6-8GB, coding+tools)"

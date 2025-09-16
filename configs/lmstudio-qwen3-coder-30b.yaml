@@ -1,0 +1,48 @@
+# LM Studio Qwen3 Coder 30B Configuration
+# Model URL: https://lmstudio.ai/models/qwen/qwen3-coder-30b
+# NOTES: Actually was decent at figuring out what tools to use (e.g. git diff, search, bash, read)
+# And was able to generate a correct config file for an LM studio model based on existing configs
+# However, when asked to review the overall, it got into an infinite loop...
+model_list:
+  - model_name: qwen3-coder-30b-lms
+    litellm_params:
+      model: openai/qwen/qwen3-coder-30b
+      api_base: http://127.0.0.1:1234/v1
+      api_key: dummy-key
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 300
+  drop_params: false
+
+general_settings:
+  master_key: dummy-key
+  completion_model: qwen3-coder-30b-lms
+
+# LM Studio Configuration
+lmstudio_config:
+  model_key: "qwen/qwen3-coder-30b"
+  server_port: 1234
+  gpu_offload: "max"
+  context_length: 262144
+
+# Model info
+model_info:
+  name: "Qwen3 Coder 30B (LM Studio)"
+  type: "local"
+  provider: "LM Studio"
+  context_length: 262144
+  parameters: "30B"
+  architecture: "MoE (Mixture of Experts)"
+  capabilities: ["coding", "programming", "software_development", "tool_calling", "code_generation"]
+  memory_requirement: "~16-24GB RAM"
+  cost: "Free (local inference)"
+  performance: "Powerful MoE coding model with native 256K context support"
+  notes: "Specialized coding model from Alibaba Qwen, optimized for software development tasks"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-lmstudio-qwen3-coder-30b"
+  runner_type: "local_lmstudio"
+  description: "Qwen3 Coder 30B MoE via LM Studio (16-24GB, specialized coding)"

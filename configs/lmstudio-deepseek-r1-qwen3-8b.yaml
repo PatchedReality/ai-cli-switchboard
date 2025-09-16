@@ -1,0 +1,44 @@
+# LM Studio DeepSeek R1 Qwen3 8B Configuration
+# Model URL: https://lmstudio.ai/models/deepseek/deepseek-r1-0528-qwen3-8b
+# NOTES: Wasn't able to get any useful responses out of it in my limited testing.
+model_list:
+  - model_name: deepseek-r1-qwen3-8b-lms
+    litellm_params:
+      model: openai/deepseek-r1-0528-qwen3-8b
+      api_base: http://127.0.0.1:1234/v1
+      api_key: dummy-key
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 300
+  drop_params: false
+
+general_settings:
+  master_key: dummy-key
+  completion_model: deepseek-r1-qwen3-8b-lms
+
+# LM Studio Configuration
+lmstudio_config:
+  model_key: "deepseek-r1-0528-qwen3-8b"
+  server_port: 1234
+  gpu_offload: "max"
+  context_length: 40960
+
+# Model info
+model_info:
+  name: "DeepSeek R1 Qwen3 8B (LM Studio)"
+  type: "local"
+  provider: "LM Studio"
+  context_length: 40960
+  parameters: "8B"
+  capabilities: ["general", "coding", "reasoning", "tool_calling"]
+  memory_requirement: "~5-8GB RAM"
+  cost: "Free (local inference)"
+  performance: "Enhanced reasoning model with Qwen3 base"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-lmstudio-deepseek-r1-qwen3-8b"
+  runner_type: "local_lmstudio"
+  description: "DeepSeek R1 Qwen3 8B via LM Studio (~6GB, enhanced reasoning)"

@@ -1,0 +1,44 @@
+# LM Studio Mistral Devstral Small 2507 Configuration
+# Model URL: https://lmstudio.ai/models/mistralai/devstral-small-2507
+model_list:
+  - model_name: devstral-small-2507-lms
+    litellm_params:
+      model: openai/mistralai/devstral-small-2507
+      api_base: http://127.0.0.1:1234/v1
+      api_key: dummy-key
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 300
+  drop_params: false
+
+general_settings:
+  master_key: dummy-key
+  completion_model: devstral-small-2507-lms
+
+# LM Studio Configuration
+lmstudio_config:
+  model_key: "mistralai/devstral-small-2507"
+  server_port: 1234
+  gpu_offload: "max"
+  context_length: 32768
+
+# Model info
+model_info:
+  name: "Mistral Devstral Small 2507 (LM Studio)"
+  type: "local"
+  provider: "LM Studio"
+  context_length: 32768
+  parameters: "22B"
+  capabilities: ["coding", "development", "tool_calling"]
+  memory_requirement: "~12-16GB RAM minimum"
+  cost: "Free (local inference)"
+  performance: "Specialized coding model with improved performance"
+  notes: "Latest Devstral model optimized for development tasks"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-lmstudio-devstral-small-2507"
+  runner_type: "local_lmstudio"
+  description: "Mistral Devstral Small 2507 via LM Studio (12-16GB, 32K context, coding specialist)"

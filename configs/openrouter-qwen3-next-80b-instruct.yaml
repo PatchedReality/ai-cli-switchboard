@@ -1,0 +1,36 @@
+# OpenRouter Qwen3 Next 80B Instruct Configuration
+# Model URL: https://openrouter.ai/qwen/qwen3-next-80b-a3b-instruct
+model_list:
+  - model_name: qwen3-next-80b-instruct
+    litellm_params:
+      model: openrouter/qwen/qwen3-next-80b-a3b-instruct
+      api_key: ${OPENROUTER_API_KEY}
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 300
+  drop_params: true
+
+general_settings:
+  master_key: dummy-key
+  completion_model: qwen3-next-80b-instruct
+
+# Model info
+model_info:
+  name: "Qwen3 Next 80B A3B Instruct (OpenRouter)"
+  type: "api"
+  provider: "OpenRouter"
+  context_length: 262144
+  parameters: "80B total (3B active)"
+  architecture: "Hybrid attention with high-sparsity MoE"
+  capabilities: ["general", "coding", "reasoning", "tool_calling"]
+  cost: "$0.098 input / $0.391 output per 1M tokens"
+  performance: "80B model with 3B active parameters for fast inference"
+  notes: "Standard instruct version - should be more direct than thinking model"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-openrouter-qwen3-next-80b-instruct"
+  runner_type: "remote_litellm"
+  description: "Qwen3 Next 80B Instruct via OpenRouter ($0.098/$0.391 per 1M tokens)"

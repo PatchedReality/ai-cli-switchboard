@@ -1,0 +1,31 @@
+# Google Gemini API Configuration
+model_list:
+  - model_name: gemini-2-flash
+    litellm_params:
+      model: gemini/gemini-2.5-flash
+      api_key: ${GEMINI_API_KEY}
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 120
+  drop_params: true
+
+general_settings:
+  master_key: dummy-key
+  completion_model: gemini-2-flash
+
+# Model info
+model_info:
+  name: "Gemini 2.5 Flash"
+  type: "remote"
+  provider: "Google"
+  context_length: 1048576
+  capabilities: ["coding", "reasoning", "tool_calling"]
+  cost: "Paid: requires billing setup, not free tier compatible"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-remote-gemini-flash"
+  runner_type: "remote_litellm"
+  description: "Gemini 2.5 Flash (ai.google.dev)"

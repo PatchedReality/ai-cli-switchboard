@@ -1,0 +1,41 @@
+# Gemma 2B Coder Local Configuration
+model_list:
+  - model_name: gemma-2b-coder
+    litellm_params:
+      model: openai/mlx-community/gemma-2b-coder
+      api_base: http://localhost:18081/v1
+      api_key: dummy-key
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 300
+  drop_params: false
+
+general_settings:
+  master_key: dummy-key
+  completion_model: gemma-2b-coder
+
+# MLX Server Configuration
+mlx_config:
+  model: "mlx-community/gemma-2b-coder"
+  port: 18081
+
+# Model info
+model_info:
+  name: "Gemma 2B Coder"
+  type: "local"
+  provider: "MLX"
+  context_length: 8192
+  parameters: "2B"
+  capabilities: ["coding", "tool_calling"]
+  memory_requirement: "~1-2GB RAM"
+  cost: "Free (local inference)"
+  performance: "Fast inference, suitable for code completion"
+  based_on: "MAISAAI/gemma-2b-coder (converted to MLX)"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-local-gemma-2b"
+  runner_type: "local_mlx"
+  description: "Gemma 2B Coder (1-2GB, fast coding)"
