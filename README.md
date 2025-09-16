@@ -6,7 +6,7 @@ Flexible AI coding assistant with support for local and remote models via LiteLL
 
 ### System Requirements
 - **macOS** with Apple Silicon (M1/M2/M3/M4) for local MLX models
-- **Python 3.10+** (Python 3.12 recommended for full MLX support)
+- **Python 3.10+**
 - **Claude Code** - Install from [Anthropic's official CLI](https://github.com/anthropics/claude-code)
 - **LM Studio** (optional) - For better local model management and tool calling
 
@@ -53,24 +53,18 @@ ls configs/
 
 # Remote models via LiteLLM (require API keys)
 ./scripts/start-remote.sh configs/remote-deepseek.yaml
-./scripts/start-remote.sh configs/remote-gemini-flash.yaml
-./scripts/start-remote.sh configs/remote-gemini-pro.yaml
 
 # Remote models via Z.AI direct (require Z.AI API key)
 ./scripts/claude-zai.sh          # GLM-4.5
-./scripts/claude-zai.sh --air    # GLM-4.5-Air
 
 # Local models via MLX (no API keys needed, requires model download)
 ./scripts/start-local.sh configs/local-glm-9b.yaml
-./scripts/start-local.sh configs/local-glm-32b.yaml
-./scripts/start-local.sh configs/local-deepseek-v2.5.yaml
-./scripts/start-local.sh configs/local-fuseo1.yaml
-./scripts/start-local.sh configs/local-gemma-2b-coder.yaml
 
 # Local models via LM Studio (better tool calling support)
 ./scripts/start-lmstudio.sh configs/lmstudio-llama-groq-tool.yaml
-./scripts/start-lmstudio.sh configs/lmstudio-gemma-7b.yaml
-./scripts/start-lmstudio.sh configs/lmstudio-gemma-2b-coder.yaml
+
+# See all available models
+ls configs/
 ```
 
 ### 3. Use with Claude Code
@@ -113,16 +107,9 @@ The setup script now automatically generates aliases from config metadata - no m
 source ai-aliases.sh         # Load aliases
 
 # Now use shortcuts like:
-claude-remote-deepseek         # Start DeepSeek-R1
-claude-remote-glm             # Start GLM-4.5 via Z.AI (direct)
-claude-remote-glm-air         # Start GLM-4.5-Air via Z.AI (direct)
-claude-local-glm-9b           # Start local GLM-9B
-claude-local-deepseek         # Start local DeepSeek-V2.5
-claude-local-fuseo1           # Start local FuseO1
-claude-local-gemma-2b         # Start local Gemma 2B
-claude-lmstudio-llama-groq    # Start Llama 3 Groq via LM Studio
-claude-lmstudio-gemma-7b      # Start CodeGemma 7B via LM Studio
-claude-lmstudio-gemma-2b      # Start Gemma 2B Coder via LM Studio
+claude-remote-deepseek         # Start DeepSeek-R1 (example remote)
+claude-local-glm-9b           # Start local GLM-9B (example local)
+claude-lmstudio-llama-groq    # Start Llama 3 Groq via LM Studio (example)
 claude-stop                   # Stop services
 claude-status                 # Check status
 claude-models                 # Show all available commands
@@ -142,47 +129,66 @@ The system supports four different runner types, each optimized for specific mod
 ### `local_mlx` - Local MLX Models
 - **Engine**: MLX framework for Apple Silicon optimization
 - **Memory usage**: Varies by model (1-30GB)
-- **Requirements**: Apple Silicon Mac, Python 3.9-3.13, MLX installed
-- **Examples**: GLM-4-9B, GLM-4-32B, DeepSeek-V2.5, FuseO1, Gemma 2B Coder
+- **Requirements**: Apple Silicon Mac, MLX installed
+- **Example**: GLM-4-9B
 - **Best for**: Fast local inference on Apple Silicon
 
 ### `local_lmstudio` - Local LM Studio Models
 - **Engine**: LM Studio with enhanced tool calling support
 - **Memory usage**: Varies by model (1-8GB)
 - **Requirements**: LM Studio installed, models downloaded via LM Studio
-- **Examples**: Gemma 2B Coder, CodeGemma 7B, Llama 3 Groq Tool Use
+- **Example**: Llama 3 Groq Tool Use
 - **Best for**: Models requiring better function calling capabilities
 
 ### `remote_litellm` - Remote API Models via LiteLLM
 - **Engine**: LiteLLM proxy for API model abstraction
 - **Requirements**: API keys, internet connection
-- **Examples**: DeepSeek-R1, Gemini 2.5 Flash
+- **Example**: DeepSeek-R1
 - **Best for**: Access to state-of-the-art remote models
 
 ### `remote_zai` - Remote Z.AI Direct Connection
 - **Engine**: Direct connection to Z.AI endpoints
 - **Requirements**: Z.AI API key, no local proxy needed
-- **Examples**: GLM-4.5-Air, GLM-4.5
+- **Example**: GLM-4.5
 - **Best for**: Direct access to GLM models without proxy overhead
 
 ## 📊 Available Models
 
-### Remote Models (require API keys)
-- **DeepSeek-R1**: Advanced reasoning model ($2.19/1M output tokens)
-- **Gemini 2.5 Flash**: Google's latest (requires billing setup)
-- **GLM-4.5-Air**: Via OpenRouter (~$0.5-2/1M tokens)
+The system supports 20+ models across four categories. Use `ls configs/` to see all available configurations.
 
-### Local Models (no API keys, requires MLX)
-- **GLM-4-9B**: Smaller, faster model (~2GB memory)
-- **GLM-4-32B**: Larger, more capable model (~8GB memory)
-- **DeepSeek-V2.5**: Advanced reasoning model (~25-30GB memory)
-- **FuseO1**: DeepSeek+Qwen Coder fusion (~6-8GB memory)
-- **Gemma 2B Coder**: Ultra-fast coding model (~1-2GB memory)
+### Remote Models (require API keys)
+- **Example**: DeepSeek-R1 - Advanced reasoning model ($2.19/1M output tokens)
+- See `configs/remote-*.yaml` for all remote options
+
+### Local MLX Models (no API keys, requires MLX)
+- **Example**: GLM-4-9B - Smaller, faster model (~2GB memory)
+- See `configs/local-*.yaml` for all local options
 
 ### LM Studio Models (better tool calling support)
-- **Gemma 2B Coder**: Ultra-fast coding via LM Studio (~1-2GB memory)
-- **CodeGemma 7B**: Enhanced coding model via LM Studio (~5GB memory)
-- **Llama 3 Groq 8B Tool Use**: Specialized for function calling (~5GB memory, 89.06% BFCL)
+- **Example**: Llama 3 Groq 8B Tool Use - Specialized for function calling (~5GB memory, 89.06% BFCL)
+- See `configs/lmstudio-*.yaml` for all LM Studio options
+
+## 🔧 Adding New Models
+
+To add a new model:
+
+1. **Create a config file** in `configs/` following the naming pattern:
+   - `remote-{name}.yaml` for remote models
+   - `local-{name}.yaml` for MLX local models
+   - `lmstudio-{name}.yaml` for LM Studio models
+
+2. **Copy an existing config** as a template and modify:
+   - Model name and settings
+   - Runner type (`remote_litellm`, `local_mlx`, `local_lmstudio`)
+   - Alias configuration for automatic alias generation
+
+3. **Regenerate aliases**:
+   ```bash
+   ./scripts/setup-aliases.sh
+   source ai-aliases.sh
+   ```
+
+4. **Your new model** will automatically appear in `claude-models` list!
 
 ## 🔧 Technical Details
 
@@ -229,21 +235,8 @@ This is a known limitation of Google's Vertex AI context caching system when use
 ### Setup Issues
 - **`litellm` command not found**: Run `pip3 install 'litellm[proxy]' --user` and add the appropriate Python user bin directory to PATH (e.g., `export PATH="$HOME/Library/Python/$(python3 --version | cut -d' ' -f2 | cut -d'.' -f1-2)/bin:$PATH")`
 - **`claude` command not found**: Install Claude Code from https://github.com/anthropics/claude-code
-- **Python version**: Requires Python 3.10+ for general use, 3.9-3.13 for MLX local models
-- **MLX installation**: Requires Apple Silicon Mac with Python 3.9-3.13
+- **MLX installation**: Requires Apple Silicon Mac
 
-### Python Version Management
-MLX works with Python 3.9-3.13. If you need a specific version:
-```bash
-# Install specific Python version via Homebrew (if needed)
-brew install python@3.13
-
-# Make it the default python3 (add to ~/.zshrc or ~/.bashrc)
-export PATH="/usr/local/opt/python@3.13/libexec/bin:$PATH"
-
-# Verify the version
-python3 --version
-```
 
 ## 📁 Project Structure
 
