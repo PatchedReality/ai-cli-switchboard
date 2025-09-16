@@ -1,0 +1,47 @@
+# LM Studio GPT-OSS-20B Configuration
+# Model URL: https://lmstudio.ai/models/openai/gpt-oss-20b
+# NOTES: Errored out "The number of tokens to keep from the initial prompt is greater than the context length"
+model_list:
+  - model_name: gpt-oss-20b-lms
+    litellm_params:
+      model: openai/mlx-community/gpt-oss-20b-MXFP4-Q8
+      api_base: http://127.0.0.1:1234/v1
+      api_key: dummy-key
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 300
+  drop_params: false
+
+general_settings:
+  master_key: dummy-key
+  completion_model: gpt-oss-20b-lms
+
+# LM Studio Configuration
+lmstudio_config:
+  model_key: "gpt-oss-20b"
+  server_port: 1234
+  gpu_offload: "max"
+  context_length: 131072
+
+# Model info
+model_info:
+  name: "GPT-OSS-20B (LM Studio)"
+  type: "local"
+  provider: "LM Studio"
+  context_length: 131072
+  parameters: "20.9B"
+  quantization: "4-bit (MXFP4-Q8)"
+  capabilities: ["text_generation", "conversational_ai", "tool_calling"]
+  memory_requirement: "~12-16GB RAM"
+  cost: "Free (local inference)"
+  performance: "MLX-optimized via LM Studio for better tool calling"
+  notes: "Apache 2.0 licensed, converted from OpenAI GPT-OSS-20B"
+  license: "Apache 2.0"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-lmstudio-gpt-oss-20b"
+  runner_type: "local_lmstudio"
+  description: "GPT-OSS-20B via LM Studio (12-16GB, 20B params, better tools)"

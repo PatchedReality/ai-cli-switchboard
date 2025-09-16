@@ -1,0 +1,45 @@
+# LM Studio Microsoft Phi-4 Reasoning Plus Configuration
+# Model URL: https://lmstudio.ai/models/microsoft/phi-4-reasoning-plus
+model_list:
+  - model_name: phi-4-reasoning-plus-lms
+    litellm_params:
+      model: openai/microsoft/phi-4-reasoning-plus
+      api_base: http://127.0.0.1:1234/v1
+      api_key: dummy-key
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 300
+  drop_params: false
+
+general_settings:
+  master_key: dummy-key
+  completion_model: phi-4-reasoning-plus-lms
+
+# LM Studio Configuration
+lmstudio_config:
+  model_key: "microsoft/phi-4-reasoning-plus"
+  server_port: 1234
+  gpu_offload: "max"
+  context_length: 131072
+
+# Model info
+model_info:
+  name: "Microsoft Phi-4 Reasoning Plus (LM Studio)"
+  type: "local"
+  provider: "LM Studio"
+  context_length: 131072
+  parameters: "14B"
+  capabilities: ["reasoning", "coding", "tool_calling", "mathematical_reasoning", "chain_of_thought"]
+  memory_requirement: "~8GB RAM minimum"
+  cost: "Free (local inference)"
+  performance: "Advanced reasoning with ~50% more tokens than previous version"
+  notes: "MIT licensed, trained for tool use, optimized for math/science/coding"
+  license: "MIT"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-lmstudio-phi-4-plus"
+  runner_type: "local_lmstudio"
+  description: "Microsoft Phi-4 Reasoning Plus via LM Studio (8GB+, 128K context, advanced reasoning)"

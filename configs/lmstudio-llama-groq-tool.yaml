@@ -1,4 +1,5 @@
 # LM Studio Llama 3 Groq 8B Tool Use Configuration
+# Model URL: https://huggingface.co/lmstudio-community/Llama-3-Groq-8B-Tool-Use-GGUF
 model_list:
   - model_name: llama-groq-tool-lms
     litellm_params:
@@ -21,14 +22,14 @@ lmstudio_config:
   model_key: "llama-3-groq-8b-tool-use"
   server_port: 1234
   gpu_offload: "max"
-  context_length: 32768
+  context_length: 131072
 
 # Model info
 model_info:
   name: "Llama 3 Groq 8B Tool Use (LM Studio)"
   type: "local"
   provider: "LM Studio"
-  context_length: 32768
+  context_length: 131072
   parameters: "8B"
   capabilities: ["tool_calling", "api_interactions", "structured_data"]
   memory_requirement: "~5-6GB RAM"

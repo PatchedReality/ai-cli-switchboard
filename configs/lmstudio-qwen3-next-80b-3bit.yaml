@@ -1,0 +1,46 @@
+# LM Studio Qwen3 Next 80B 3-bit Configuration
+# Model URL: https://huggingface.co/NexVeridian/Qwen3-Next-80B-A3B-Instruct-3bit
+model_list:
+  - model_name: qwen3-next-80b-a3b-instruct
+    litellm_params:
+      model: openai/qwen3-next-80b-a3b-instruct
+      api_base: http://127.0.0.1:1234/v1
+      api_key: dummy-key
+
+litellm_settings:
+  success_callback: []
+  failure_callback: []
+  request_timeout: 300
+  drop_params: false
+
+general_settings:
+  master_key: dummy-key
+  completion_model: qwen3-next-80b-a3b-instruct
+
+# LM Studio Configuration
+lmstudio_config:
+  model_key: "qwen3-next-80b-a3b-instruct"
+  server_port: 1234
+  gpu_offload: "max"
+  context_length: 131072
+
+# Model info
+model_info:
+  name: "Qwen3 Next 80B 3-bit (LM Studio)"
+  type: "local"
+  provider: "LM Studio"
+  context_length: 131072
+  parameters: "79.7B"
+  quantization: "3-bit"
+  architecture: "Hybrid attention with high-sparsity MoE"
+  capabilities: ["general", "coding", "reasoning", "tool_calling"]
+  memory_requirement: "~35-40GB RAM (3-bit quantization)"
+  cost: "Free (local inference)"
+  performance: "80B model with aggressive 3-bit quantization for memory efficiency"
+  notes: "3-bit quantized version should fit comfortably in 64GB system memory"
+
+# Alias configuration
+alias_config:
+  alias_name: "claude-lmstudio-qwen3-next-80b-3bit"
+  runner_type: "local_lmstudio"
+  description: "Qwen3 Next 80B 3-bit via LM Studio (35-40GB, aggressive quantization)"
