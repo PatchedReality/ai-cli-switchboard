@@ -155,6 +155,15 @@ else
     fi
 fi
 
+# Configure Codex CLI profiles if Codex is installed
+if command -v codex >/dev/null 2>&1; then
+    echo "🤖 Configuring Codex CLI profiles..."
+    scripts/setup-codex.sh
+else
+    echo "ℹ️  Codex CLI not detected. Install with 'npm install -g @openai/codex' or 'brew install codex'"
+    echo "   Run ./scripts/setup-codex.sh after installing to generate profiles."
+fi
+
 # Check if critical dependencies were installed successfully
 LITELLM_INSTALLED=false
 MLX_INSTALLED=false

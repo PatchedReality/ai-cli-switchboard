@@ -93,17 +93,21 @@ run_server()
 LITELLM_PID=$!
 echo $LITELLM_PID > litellm-proxy.pid
 
-# Wait for LiteLLM to be ready
+# Wait for LiteLLM to be ready and test model functionality
 echo "⏳ Waiting for LiteLLM proxy to be ready..."
 for i in {1..30}; do
-    if curl -sf -H "Authorization: Bearer dummy-key" http://localhost:18080/health >/dev/null 2>&1; then
-        echo "✅ LiteLLM proxy is ready!"
+    if curl -sf -H "Authorization: Bearer dummy-key" -H "Content-Type: application/json" \
+         -d '{"model": "'$MODEL_NAME'", "messages": [{"role": "user", "content": "test"}], "max_tokens": 1}' \
+         http://localhost:18080/v1/chat/completions >/dev/null 2>&1; then
+        echo "✅ LiteLLM proxy is ready and model is functional!"
         break
     fi
     if [ $i -eq 30 ]; then
+        echo "❌ LiteLLM proxy failed to start or model configuration is invalid"
+        echo "📋 Check the log for errors: tail -50 litellm-proxy.log"
         kill $LITELLM_PID 2>/dev/null || true
         "$LMS_PATH" server stop >/dev/null 2>&1 || true
-        error "LiteLLM proxy failed to start"
+        error "LiteLLM proxy failed to start - check configuration and logs"
     fi
     sleep 1
 done

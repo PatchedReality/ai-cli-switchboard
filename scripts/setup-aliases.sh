@@ -16,6 +16,27 @@ cat > "$PROJECT_DIR/ai-aliases.sh" << 'STATIC_HEADER'
 # Get the directory of this script
 AI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+codex_profile_runner() {
+    local profile="$1"
+    local runner_type="$2"
+    local config_basename="$3"
+    shift 3
+
+    case "$runner_type" in
+        local_mlx)
+            "$AI_DIR/scripts/start-local.sh" "$AI_DIR/configs/$config_basename" || return $?
+            ;;
+        local_lmstudio)
+            "$AI_DIR/scripts/start-lmstudio.sh" "$AI_DIR/configs/$config_basename" || return $?
+            ;;
+        remote_litellm)
+            "$AI_DIR/scripts/start-remote.sh" "$AI_DIR/configs/$config_basename" || return $?
+            ;;
+    esac
+
+    env LITELLM_API_KEY="${LITELLM_API_KEY:-dummy-key}" codex --profile "$profile" "$@"
+}
+
 STATIC_HEADER
 
 # Categorize all configs
@@ -27,6 +48,16 @@ declare -a local_lmstudio_aliases=()
 declare -a remote_litellm_aliases=()
 declare -a remote_zai_aliases=()
 declare -a all_aliases=()
+declare -a codex_profiles=()
+
+build_codex_profile_id() {
+    local alias_name="$1"
+    if [[ "$alias_name" == claude-* ]]; then
+        echo "codex-${alias_name#claude-}"
+    else
+        echo "codex-$alias_name"
+    fi
+}
 
 # Process local MLX configs
 for entry in "${configs_local_mlx[@]}"; do
@@ -35,6 +66,8 @@ for entry in "${configs_local_mlx[@]}"; do
     if [ $? -eq 0 ]; then
         local_mlx_aliases+=("$alias_command")
         all_aliases+=("$config_alias_name:$config_description")
+        codex_profile_id=$(build_codex_profile_id "$config_alias_name")
+        codex_profiles+=("$codex_profile_id|$config_alias_name|$config_description|$config_runner_type|$config_basename")
     fi
 done
 
@@ -45,6 +78,8 @@ for entry in "${configs_local_lmstudio[@]}"; do
     if [ $? -eq 0 ]; then
         local_lmstudio_aliases+=("$alias_command")
         all_aliases+=("$config_alias_name:$config_description")
+        codex_profile_id=$(build_codex_profile_id "$config_alias_name")
+        codex_profiles+=("$codex_profile_id|$config_alias_name|$config_description|$config_runner_type|$config_basename")
     fi
 done
 
@@ -55,6 +90,8 @@ for entry in "${configs_remote_litellm[@]}"; do
     if [ $? -eq 0 ]; then
         remote_litellm_aliases+=("$alias_command")
         all_aliases+=("$config_alias_name:$config_description")
+        codex_profile_id=$(build_codex_profile_id "$config_alias_name")
+        codex_profiles+=("$codex_profile_id|$config_alias_name|$config_description|$config_runner_type|$config_basename")
     fi
 done
 
@@ -85,6 +122,16 @@ done
     echo ""
     echo "# Remote Models (Z.AI Direct)"
     printf '%s\n' "${remote_zai_aliases[@]}"
+
+    if [ ${#codex_profiles[@]} -gt 0 ]; then
+        echo ""
+        echo "# Codex CLI Profiles"
+        for codex_entry in "${codex_profiles[@]}"; do
+            IFS='|' read -r codex_profile_id codex_source_alias codex_description codex_runner_type codex_config_basename <<< "$codex_entry"
+            printf 'alias %s="codex_profile_runner %s %s %s"\n' \
+                "$codex_profile_id" "$codex_profile_id" "$codex_runner_type" "$codex_config_basename"
+        done
+    fi
 
     echo ""
     echo "# Universal commands"
@@ -152,6 +199,19 @@ done
     echo -n "echo '      claude-stop - Stop all services'; "
     echo -n "echo '      claude-status - Check what'\''s running'; "
     echo -n "echo '      claude-models - Show this help'; "
+    if [ ${#codex_profiles[@]} -gt 0 ]; then
+        echo -n "echo '  🤖  Codex CLI:'; "
+        for codex_entry in "${codex_profiles[@]}"; do
+            IFS='|' read -r codex_profile_id codex_source_alias codex_description codex_runner_type codex_config_basename <<< "$codex_entry"
+            codex_label="$codex_profile_id"
+            if [ -n "$codex_description" ]; then
+                echo -n "echo '      $codex_label - $codex_description'; "
+            else
+                echo -n "echo '      $codex_label'; "
+            fi
+        done
+        echo -n "echo '      codex-models - Show Codex profiles'; "
+    fi
     echo -n "echo '  🖥️  Claude Code:'; "
     echo -n "echo '      claudel - Run Claude Code with local proxy'"
     echo '"'
@@ -160,6 +220,24 @@ done
     echo 'echo "🤖 AI model aliases loaded!"'
     echo 'echo "Usage: claude-models (to see all commands)"'
     echo 'echo "Use '\''claudel'\'' to run Claude Code with your local models"'
+    if [ ${#codex_profiles[@]} -gt 0 ]; then
+        echo 'echo "Use codex-models to list Codex CLI profiles"'
+    fi
+
+    if [ ${#codex_profiles[@]} -gt 0 ]; then
+        echo ""
+        echo "# Codex profile helper"
+        echo -n 'alias codex-models="echo '\''Codex CLI Profiles:'\''; '
+        for codex_entry in "${codex_profiles[@]}"; do
+            IFS='|' read -r codex_profile_id codex_source_alias codex_description codex_runner_type codex_config_basename <<< "$codex_entry"
+            if [ -n "$codex_description" ]; then
+                echo -n "echo '      $codex_profile_id (from $codex_source_alias: $codex_description)'; "
+            else
+                echo -n "echo '      $codex_profile_id (from $codex_source_alias)'; "
+            fi
+        done
+        echo '"'
+    fi
 
 } >> "$PROJECT_DIR/ai-aliases.sh"
 
@@ -185,6 +263,9 @@ if [ ${#remote_litellm_aliases[@]} -gt 0 ]; then
 fi
 if [ ${#remote_zai_aliases[@]} -gt 0 ]; then
     echo "   🔗 Remote Z.AI Models: ${#remote_zai_aliases[@]}"
+fi
+if [ ${#codex_profiles[@]} -gt 0 ]; then
+    echo "   🤖 Codex CLI Profiles: ${#codex_profiles[@]}"
 fi
 
 echo ""

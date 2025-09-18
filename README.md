@@ -1,6 +1,6 @@
-# Claude + Multi-Model AI Assistant
+# AI CLI Switchboard
 
-Flexible AI coding assistant with support for local and remote models via LiteLLM proxy. Use any model with the same Claude Code interface and tools.
+A simple framework for using Claude Code or Codex CLI as the frontend to any cloud or local LLM on Apple Silicon. Connect locally via LiteLLM + MLX or LM Studio, or remotely via Z.AI, Gemini/Google AI Studio, DeepSeek, or OpenRouter.
 
 ## 📋 Prerequisites
 
@@ -83,6 +83,30 @@ claudel
    This may lead to unexpected behavior.
 ```
 This warning can be safely ignored when using local models via the proxy. The `claudel` alias is designed to work with this configuration.
+
+### 4. Use with Codex CLI
+
+```bash
+# Install Codex CLI if needed
+npm install -g @openai/codex
+
+# Step 1: Generate Codex profiles
+./scripts/setup-codex.sh
+
+# Step 2: Generate shell aliases (includes codex-* shortcuts)
+./scripts/setup-aliases.sh
+source ai-aliases.sh
+
+# Now use Codex with any model (starts backend automatically)
+codex-models                # List all available Codex profiles
+codex-local-glm-9b          # Start GLM-9B backend + launch Codex
+codex-lmstudio-llama-groq   # Start Llama Groq backend + launch Codex
+
+# Pass Codex flags as usual
+codex-local-glm-9b --sandbox danger-full-access
+```
+
+Codex profiles mirror the Claude aliases. Each `codex-*` helper first boots the corresponding configuration (calling `start-local.sh`, `start-lmstudio.sh`, or `start-remote.sh`) and then launches Codex pointed at the LiteLLM proxy (`http://localhost:18080/v1`). The helper also sets `LITELLM_API_KEY=${LITELLM_API_KEY:-dummy-key}` so it works out of the box; export a different key beforehand if your proxy requires one.
 
 ## 🎛️ Server Management
 
@@ -241,22 +265,30 @@ This is a known limitation of Google's Vertex AI context caching system when use
 ## 📁 Project Structure
 
 ```
-configs/           # Model configuration files
-├── local-*.yaml     # Local MLX models
-├── lmstudio-*.yaml  # LM Studio models
-└── remote-*.yaml    # Remote API models
+configs/                    # Model configuration files
+├── local-*.yaml              # Local MLX models
+├── lmstudio-*.yaml           # LM Studio models
+├── remote-*.yaml             # Remote API models
+└── openrouter-*.yaml         # OpenRouter models
 
-scripts/           # Management scripts
-├── start-remote.sh    # Start remote models
-├── start-local.sh     # Start local models
-├── start-lmstudio.sh  # Start LM Studio models
-├── download-model.sh  # Download models cleanly
-├── stop.sh           # Stop all services
-├── status.sh         # Check status
-└── setup-aliases.sh  # Create convenience aliases
+scripts/                    # Management scripts
+├── start-remote.sh           # Start remote models
+├── start-local.sh            # Start local models
+├── start-lmstudio.sh         # Start LM Studio models
+├── claude-zai.sh             # Start Z.AI models directly
+├── stop.sh                   # Stop all services
+├── status.sh                 # Check status
+├── setup-aliases.sh          # Create convenience aliases
+├── setup-codex.sh            # Setup Codex CLI profiles
+├── common-utils.sh           # Shared utility functions
+└── download-lmstudio-model.sh # Download LM Studio models
 
-.env              # API keys (create this)
-ai-aliases.sh     # Generated aliases (after setup)
+setup.sh                   # Main setup script
+.env                       # API keys (create this)
+ai-aliases.sh              # Generated aliases (after setup)
+litellm-proxy.log          # LiteLLM proxy logs
+mlx-server.log             # MLX server logs (when applicable)
+AGENTS.md                  # Claude Code agents documentation
 ```
 
 ---
