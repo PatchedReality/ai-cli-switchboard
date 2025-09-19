@@ -132,45 +132,6 @@ if [ $RUNNING -eq 1 ]; then
 else
     echo "❌ Main proxy not running"
     echo ""
-    echo "Available configurations:"
-
-    # Use categorized config display
-    categorize_configs "status"
-
-    # Helper function to display config entries
-    display_config_group() {
-        local group_name="$1"
-        local emoji="$2"
-        local array_name="$3"
-
-        local array_size=$(eval "echo \${#${array_name}[@]}")
-        if [ "$array_size" -gt 0 ]; then
-            echo ""
-            echo "$emoji $group_name:"
-
-            eval "configs=(\"\${${array_name}[@]}\")"
-            for entry in "${configs[@]}"; do
-                parse_config_entry "$entry" "config"
-                config_line="   📄 $config_basename: $config_name"
-                if [ -n "$config_alias_name" ]; then
-                    config_line="$config_line (alias: $config_alias_name)"
-                fi
-                echo "$config_line"
-            done
-        fi
-    }
-
-    display_config_group "Local MLX Models" "🏠" "status_local_mlx"
-    display_config_group "Local LM Studio Models" "🏪" "status_local_lmstudio"
-    display_config_group "Remote Models" "☁️" "status_remote_litellm"
-    display_config_group "Remote Z.AI Models" "🔗" "status_remote_zai"
-
-    echo ""
-    echo "🚀 To start:"
-    echo "   Remote: ./scripts/start-remote.sh configs/remote-deepseek.yaml"
-    echo "   Local:  ./scripts/start-local.sh configs/local-glm-9b.yaml"
-    echo "   LM Studio: ./scripts/start-lmstudio.sh configs/lmstudio-llama-groq-tool.yaml"
-    echo "   Or use aliases: source ai-aliases.sh && claude-models"
 fi
 
 }
