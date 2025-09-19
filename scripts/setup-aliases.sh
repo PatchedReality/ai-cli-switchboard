@@ -137,6 +137,8 @@ done
     echo "# Universal commands"
     echo 'alias claude-stop="$AI_DIR/scripts/stop.sh"'
     echo 'alias claude-status="$AI_DIR/scripts/status.sh"'
+    echo 'alias codex-stop="$AI_DIR/scripts/stop.sh"'
+    echo 'alias codex-status="$AI_DIR/scripts/status.sh"'
     echo ""
     echo "# Claude Code with local proxy"
     echo 'alias claudel="ANTHROPIC_BASE_URL=http://localhost:18080 ANTHROPIC_API_KEY=dummy-key claude"'
@@ -200,16 +202,6 @@ done
     echo -n "echo '      claude-status - Check what'\''s running'; "
     echo -n "echo '      claude-models - Show this help'; "
     if [ ${#codex_profiles[@]} -gt 0 ]; then
-        echo -n "echo '  🤖  Codex CLI:'; "
-        for codex_entry in "${codex_profiles[@]}"; do
-            IFS='|' read -r codex_profile_id codex_source_alias codex_description codex_runner_type codex_config_basename <<< "$codex_entry"
-            codex_label="$codex_profile_id"
-            if [ -n "$codex_description" ]; then
-                echo -n "echo '      $codex_label - $codex_description'; "
-            else
-                echo -n "echo '      $codex_label'; "
-            fi
-        done
         echo -n "echo '      codex-models - Show Codex profiles'; "
     fi
     echo -n "echo '  🖥️  Claude Code:'; "
@@ -227,15 +219,61 @@ done
     if [ ${#codex_profiles[@]} -gt 0 ]; then
         echo ""
         echo "# Codex profile helper"
-        echo -n 'alias codex-models="echo '\''Codex CLI Profiles:'\''; '
+        echo -n 'alias codex-models="echo '\''Available Codex Profiles:'\''; '
+
+        # Categorize codex profiles by runner type
+        declare -a codex_local_mlx=()
+        declare -a codex_local_lmstudio=()
+        declare -a codex_remote_litellm=()
+
         for codex_entry in "${codex_profiles[@]}"; do
             IFS='|' read -r codex_profile_id codex_source_alias codex_description codex_runner_type codex_config_basename <<< "$codex_entry"
-            if [ -n "$codex_description" ]; then
-                echo -n "echo '      $codex_profile_id (from $codex_source_alias: $codex_description)'; "
-            else
-                echo -n "echo '      $codex_profile_id (from $codex_source_alias)'; "
-            fi
+            case "$codex_runner_type" in
+                "local_mlx")
+                    codex_local_mlx+=("$codex_profile_id:$codex_description")
+                    ;;
+                "local_lmstudio")
+                    codex_local_lmstudio+=("$codex_profile_id:$codex_description")
+                    ;;
+                "remote_litellm")
+                    codex_remote_litellm+=("$codex_profile_id:$codex_description")
+                    ;;
+            esac
         done
+
+        # Add local MLX section
+        if [ ${#codex_local_mlx[@]} -gt 0 ]; then
+            echo -n "echo '  🏠 Local (MLX):'; "
+            for codex_desc in "${codex_local_mlx[@]}"; do
+                codex_name="${codex_desc%%:*}"
+                description="${codex_desc#*:}"
+                echo -n "echo '      $codex_name - $description'; "
+            done
+        fi
+
+        # Add local LM Studio section
+        if [ ${#codex_local_lmstudio[@]} -gt 0 ]; then
+            echo -n "echo '  🏪 Local (LM Studio):'; "
+            for codex_desc in "${codex_local_lmstudio[@]}"; do
+                codex_name="${codex_desc%%:*}"
+                description="${codex_desc#*:}"
+                echo -n "echo '      $codex_name - $description'; "
+            done
+        fi
+
+        # Add remote section
+        if [ ${#codex_remote_litellm[@]} -gt 0 ]; then
+            echo -n "echo '  ☁️  Remote:'; "
+            for codex_desc in "${codex_remote_litellm[@]}"; do
+                codex_name="${codex_desc%%:*}"
+                description="${codex_desc#*:}"
+                echo -n "echo '      $codex_name - $description'; "
+            done
+        fi
+
+        echo -n "echo '  🎛️  Control:'; "
+        echo -n "echo '      codex-stop - Stop all services'; "
+        echo -n "echo '      codex-status - Check what'\''s running'"
         echo '"'
     fi
 

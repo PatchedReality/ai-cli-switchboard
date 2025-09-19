@@ -3,6 +3,56 @@
 
 set -e
 
+# Function to check if pip supports --break-system-packages flag
+supports_break_system_packages() {
+    local pip_version=$(pip3 --version 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -1)
+    if [ -z "$pip_version" ]; then
+        return 1
+    fi
+
+    # Compare version - need pip >= 23.0.1
+    local major=$(echo "$pip_version" | cut -d'.' -f1)
+    local minor=$(echo "$pip_version" | cut -d'.' -f2)
+    local patch=$(echo "$pip_version" | cut -d'.' -f3)
+
+    if [ "$major" -gt 23 ]; then
+        return 0
+    elif [ "$major" -eq 23 ] && [ "$minor" -gt 0 ]; then
+        return 0
+    elif [ "$major" -eq 23 ] && [ "$minor" -eq 0 ] && [ "$patch" -ge 1 ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Function to install package with appropriate pip flags
+install_with_pip() {
+    local package="$1"
+    local description="$2"
+
+    echo "   📥 Installing $description..."
+
+    if supports_break_system_packages; then
+        if pip3 install "$package" --user --upgrade --break-system-packages; then
+            echo "   ✅ $description installed successfully"
+            return 0
+        else
+            echo "   ❌ Failed to install $description with --break-system-packages"
+            return 1
+        fi
+    else
+        echo "   💡 Using --user flag (older pip version detected)"
+        if pip3 install "$package" --user --upgrade; then
+            echo "   ✅ $description installed successfully"
+            return 0
+        else
+            echo "   ❌ Failed to install $description"
+            return 1
+        fi
+    fi
+}
+
 echo "🚀 Setting up Claude Multi-Model AI Assistant..."
 echo ""
 
@@ -25,16 +75,17 @@ if [[ "$PYTHON_MAJOR" -eq 3 ]] && [[ "$PYTHON_MINOR" -ge 9 ]]; then
     MLX_COMPATIBLE=true
 fi
 
-if [[ "$PYTHON_VERSION" < "3.10" ]]; then
-    echo "⚠️  Python 3.10+ recommended. Found: $PYTHON_VERSION"
-    echo "   Current setup may work but upgrade recommended"
+if [[ "$PYTHON_VERSION" < "3.9" ]]; then
+    echo "❌ Python 3.9+ required. Found: $PYTHON_VERSION"
+    echo "   MLX requires Python 3.9+ and LiteLLM requires Python 3.8+"
+    echo "   Please upgrade Python and try again."
+    echo "   Recommended: brew install python@3.13"
+    exit 1
+elif [[ "$PYTHON_VERSION" < "3.10" ]]; then
+    echo "⚠️  Python 3.9 detected. Supported but 3.10+ recommended."
+    echo "   Found: $PYTHON_VERSION"
+    echo "   Note: Some pip features may be limited with older Python versions"
     echo ""
-    read -p "Continue anyway? (y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Setup cancelled. Upgrade Python and try again."
-        exit 1
-    fi
 elif [[ "$MLX_COMPATIBLE" == false ]]; then
     echo "⚠️  Python $PYTHON_VERSION detected - MLX local models not supported"
     echo "   MLX requires Python 3.9+ with native ARM architecture"
@@ -59,25 +110,25 @@ if python3 -c "import litellm" 2>/dev/null; then
     LITELLM_VERSION=$(python3 -c "import litellm._version; print(litellm._version.version)" 2>/dev/null || echo "unknown")
     echo "   📄 Version: $LITELLM_VERSION"
 else
-    echo "   📥 Installing LiteLLM..."
     # Try multiple installation strategies
-    if pip3 install 'litellm[proxy]' --user --upgrade --break-system-packages 2>/dev/null; then
-        echo "   ✅ LiteLLM installed successfully"
-    elif pip3 install litellm --user --upgrade --break-system-packages 2>/dev/null; then
-        echo "   ✅ LiteLLM core installed successfully (proxy features may be limited)"
-    elif pip3 install 'litellm==1.50.0' --user --break-system-packages 2>/dev/null; then
-        echo "   ✅ LiteLLM installed successfully (pinned version)"
+    if install_with_pip 'litellm[proxy]' "LiteLLM with proxy support"; then
+        true  # Success
+    elif install_with_pip 'litellm' "LiteLLM core"; then
+        echo "   💡 Proxy features may be limited without [proxy] extra"
     elif command -v conda >/dev/null 2>&1 && conda install -c conda-forge litellm -y 2>/dev/null; then
         echo "   ✅ LiteLLM installed via conda"
     else
-        echo "   ⚠️  LiteLLM installation failed - trying alternative approaches..."
-        if pip3 install --user --break-system-packages --no-deps litellm 2>/dev/null; then
-            echo "   ✅ LiteLLM core installed - proxy features may be limited"
-            echo "   💡 Try installing proxy dependencies manually if needed:"
-            echo "       pip3 install --user --break-system-packages pydantic fastapi uvicorn"
+        echo "   ⚠️  LiteLLM installation failed - trying fallback installation..."
+        if supports_break_system_packages; then
+            pip3 install --user --break-system-packages --no-deps litellm || echo "   ❌ Fallback installation failed"
         else
-            echo "   ⚠️  All installation methods failed"
-            echo "   💡 Try manual installation: pip3 install --user --break-system-packages litellm"
+            pip3 install --user --no-deps litellm || echo "   ❌ Fallback installation failed"
+        fi
+        echo "   💡 If issues persist, try manual installation:"
+        if supports_break_system_packages; then
+            echo "       pip3 install --user --break-system-packages litellm"
+        else
+            echo "       pip3 install --user litellm"
         fi
     fi
 fi
@@ -90,21 +141,26 @@ if [[ "$OSTYPE" == "darwin"* ]] && [[ "$MLX_COMPATIBLE" == true ]]; then
         MLX_VERSION=$(python3 -c "import mlx_lm; print(mlx_lm.__version__)" 2>/dev/null || echo "unknown")
         echo "   📄 Version: $MLX_VERSION"
     else
-        echo "   📥 Installing MLX..."
         # Try multiple installation strategies for MLX
         if arch | grep -q arm64; then
             echo "   📥 Installing MLX framework for Apple Silicon..."
-            # MLX is available on PyPI - try direct installation
-            if pip3 install mlx --user --break-system-packages 2>/dev/null; then
-                echo "   ✅ MLX framework installed from PyPI"
+            # Install MLX framework first
+            if install_with_pip 'mlx' "MLX framework"; then
                 # Now install mlx-lm
-                if pip3 install mlx-lm --user --break-system-packages 2>/dev/null; then
-                    echo "   ✅ MLX-LM installed successfully - local models supported"
+                if install_with_pip 'mlx-lm' "MLX-LM"; then
+                    echo "   ✅ MLX installation complete - local models supported"
                 else
                     echo "   ⚠️  MLX-LM installation failed, trying without dependencies..."
-                    if pip3 install --user --break-system-packages --no-deps mlx-lm 2>/dev/null; then
-                        echo "   ✅ MLX-LM installed (some dependencies may be missing)"
-                        echo "   💡 Try: pip3 install --user --break-system-packages numpy transformers torch huggingface-hub"
+                    if supports_break_system_packages; then
+                        pip3 install --user --break-system-packages --no-deps mlx-lm || echo "   ❌ MLX-LM fallback failed"
+                    else
+                        pip3 install --user --no-deps mlx-lm || echo "   ❌ MLX-LM fallback failed"
+                    fi
+                    echo "   💡 Some dependencies may be missing. Try installing manually:"
+                    if supports_break_system_packages; then
+                        echo "       pip3 install --user --break-system-packages numpy transformers torch huggingface-hub"
+                    else
+                        echo "       pip3 install --user numpy transformers torch huggingface-hub"
                     fi
                 fi
             else
@@ -112,8 +168,13 @@ if [[ "$OSTYPE" == "darwin"* ]] && [[ "$MLX_COMPATIBLE" == true ]]; then
                 echo "   💡 MLX requires:"
                 echo "       - macOS >= 13.5 (recommended: macOS 14 Sonoma)"
                 echo "       - Apple Silicon Mac (M-series chip)"
-                echo "       - Python 3.9-3.12 (Python 3.12 recommended)"
-                echo "   💡 Try manual installation: pip3 install --user --break-system-packages mlx"
+                echo "       - Python 3.9+ (Python 3.10+ recommended)"
+                echo "   💡 Try manual installation:"
+                if supports_break_system_packages; then
+                    echo "       pip3 install --user --break-system-packages mlx mlx-lm"
+                else
+                    echo "       pip3 install --user mlx mlx-lm"
+                fi
             fi
         else
             echo "   ⚠️  MLX requires Apple Silicon Mac (arm64 architecture)"
