@@ -187,7 +187,15 @@ stop_process_by_pidfile() {
         local pid=$(cat "$pidfile")
         if is_process_running "$pid"; then
             log_with_time "📝 Stopping $service_name (PID: $pid)..."
-            kill "$pid"
+            # Kill child processes first
+            pkill -P "$pid" 2>/dev/null || true
+            # Then kill the parent
+            kill "$pid" 2>/dev/null || true
+            # Wait a moment and force kill if still running
+            sleep 1
+            if is_process_running "$pid"; then
+                kill -9 "$pid" 2>/dev/null || true
+            fi
             return 0
         fi
         rm -f "$pidfile"
