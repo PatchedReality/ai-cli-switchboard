@@ -79,10 +79,8 @@ default_profile=""
 TMP_GENERATED=$(mktemp)
 {
     echo "$MARKER_START"
-    echo "model_provider = \"$PROVIDER_ID\""
-
-    default_profile="${profiles[0]%%|*}"
-    echo "profile = \"$default_profile\""
+    echo "# Note: The default 'codex' command is not modified by this config."
+    echo "# Use the generated 'codex-*' aliases which specify --profile explicitly."
     echo ""
     echo "[$PROVIDER_TABLE]"
     echo "name = \"$PROVIDER_NAME\""
@@ -155,16 +153,20 @@ fi
 mv "$TMP_FINAL" "$CODEX_CONFIG"
 rm -f "$TMP_GENERATED" "$TMP_SANITIZED"
 
+first_profile="${profiles[0]%%|*}"
+
 cat <<INFO
 ✅ Codex configuration updated: $CODEX_CONFIG
    - Provider ID: $PROVIDER_ID
    - Base URL: $PROVIDER_BASE_URL
    - Profiles generated: ${#profiles[@]}
-   - Default profile: $default_profile
+   - Default 'codex' command: unchanged (still uses your original GPT config)
 
 Set your LiteLLM API key before running Codex:
    export $PROVIDER_ENV_KEY=dummy-key
 
-Run Codex with a generated profile, e.g.:
-   codex --profile "$default_profile"
+Run Codex with a generated alias, e.g.:
+   $first_profile
+
+Or use codex-models to see all available profiles.
 INFO

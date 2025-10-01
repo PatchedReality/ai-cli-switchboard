@@ -9,32 +9,32 @@ echo "🔧 Setting up AI model aliases dynamically..."
 echo ""
 
 # Start creating the alias file
-cat > "$PROJECT_DIR/ai-aliases.sh" << 'STATIC_HEADER'
+cat > "$PROJECT_DIR/ai-aliases.sh" << STATIC_HEADER
 #!/bin/bash
 # AI Model Aliases - Source this file or add to your .bashrc/.zshrc
 
-# Get the directory of this script
-AI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Set the absolute path to the AI project directory
+AI_DIR="$PROJECT_DIR"
 
 codex_profile_runner() {
-    local profile="$1"
-    local runner_type="$2"
-    local config_basename="$3"
+    local profile="\$1"
+    local runner_type="\$2"
+    local config_basename="\$3"
     shift 3
 
-    case "$runner_type" in
+    case "\$runner_type" in
         local_mlx)
-            "$AI_DIR/scripts/start-local.sh" "$AI_DIR/configs/$config_basename" || return $?
+            "\$AI_DIR/scripts/start-local.sh" "\$AI_DIR/configs/\$config_basename" || return \$?
             ;;
         local_lmstudio)
-            "$AI_DIR/scripts/start-lmstudio.sh" "$AI_DIR/configs/$config_basename" || return $?
+            "\$AI_DIR/scripts/start-lmstudio.sh" "\$AI_DIR/configs/\$config_basename" || return \$?
             ;;
         remote_litellm)
-            "$AI_DIR/scripts/start-remote.sh" "$AI_DIR/configs/$config_basename" || return $?
+            "\$AI_DIR/scripts/start-remote.sh" "\$AI_DIR/configs/\$config_basename" || return \$?
             ;;
     esac
 
-    env LITELLM_API_KEY="${LITELLM_API_KEY:-dummy-key}" codex --profile "$profile" "$@"
+    env LITELLM_API_KEY="\${LITELLM_API_KEY:-dummy-key}" codex --profile "\$profile" "\$@"
 }
 
 STATIC_HEADER
