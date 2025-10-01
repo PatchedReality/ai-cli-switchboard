@@ -37,6 +37,15 @@ codex_profile_runner() {
     env LITELLM_API_KEY="\${LITELLM_API_KEY:-dummy-key}" codex --profile "\$profile" "\$@"
 }
 
+claude_runner() {
+    local script="\$1"
+    local config="\$2"
+    shift 2
+
+    "\$script" "\$config" || return \$?
+    env ANTHROPIC_BASE_URL=http://localhost:18080 ANTHROPIC_API_KEY=dummy-key claude "\$@"
+}
+
 STATIC_HEADER
 
 # Categorize all configs

@@ -140,10 +140,11 @@ generate_alias_command() {
     fi
 
     if [[ "$runner_type" == "remote_zai" && "$script_name" == "claude-zai.sh"* ]]; then
-        # Special handling for Z.AI direct scripts
-        echo "alias $alias_name=\"\$AI_DIR/scripts/$script_name\""
+        # Special handling for Z.AI direct scripts - use claude_runner
+        echo "alias $alias_name=\"claude_runner '\$AI_DIR/scripts/$script_name' ''\""
     else
-        echo "alias $alias_name=\"\$AI_DIR/scripts/$script_name \$AI_DIR/configs/$config_basename\""
+        # Use claude_runner to start backend and launch Claude Code
+        echo "alias $alias_name=\"claude_runner '\$AI_DIR/scripts/$script_name' '\$AI_DIR/configs/$config_basename'\""
     fi
 }
 
